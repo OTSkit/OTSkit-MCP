@@ -6,7 +6,7 @@ import { insertStamp } from '../../src/db/stamps.js'
 import { upgradeTimestamp } from '../../src/tools/upgrade-timestamp.js'
 import type { Config } from '../../src/types.js'
 
-vi.mock('@alexalves87/opentimestamps-client', () => {
+vi.mock('@otskit/client', () => {
   return {
     OpenTimestampsClient: vi.fn().mockImplementation(() => ({
       upgrade: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
@@ -16,7 +16,7 @@ vi.mock('@alexalves87/opentimestamps-client', () => {
 })
 
 // Mock core library: no bitcoin attestation
-vi.mock('@alexalves87/opentimestamps', () => ({
+vi.mock('@otskit/core', () => ({
   deserializeOTS: vi.fn().mockReturnValue({ attestations: [] }),
   hasConfirmedAttestation: vi.fn().mockReturnValue(false),
   getEarliestBitcoinBlock: vi.fn().mockReturnValue(undefined),

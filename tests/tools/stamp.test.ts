@@ -5,7 +5,7 @@ import { initDb } from '../../src/db/schema.js'
 import { createTimestamp } from '../../src/tools/create-timestamp.js'
 import type { Config } from '../../src/types.js'
 
-vi.mock('@alexalves87/opentimestamps-client', () => ({
+vi.mock('@otskit/client', () => ({
   OpenTimestampsClient: vi.fn().mockImplementation(() => ({
     stamp: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
   })),

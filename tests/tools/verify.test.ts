@@ -6,7 +6,7 @@ import { insertStamp } from '../../src/db/stamps.js'
 import { verifyTimestamp } from '../../src/tools/verify-timestamp.js'
 import type { Config } from '../../src/types.js'
 
-vi.mock('@alexalves87/opentimestamps-client', () => ({
+vi.mock('@otskit/client', () => ({
   OpenTimestampsClient: vi.fn().mockImplementation(() => ({
     verify: vi.fn().mockResolvedValue({ valid: false, error: 'No Bitcoin attestation found' }),
   })),
