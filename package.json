@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@otskit/core": "^0.1.0",
-    "@otskit/client": "^0.1.0",
+    "@otskit/client": "^0.1.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "better-sqlite3": "^12.10.0",
     "archiver": "^7.0.0"
