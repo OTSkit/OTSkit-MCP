@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs'
 import { OpenTimestampsClient, UpgradeError } from '@otskit/client'
-import { deserializeOTS, hasConfirmedAttestation, getEarliestBitcoinBlock } from '@otskit/core'
+import { DetachedTimestampFile } from '@otskit/core'
 import type { Database } from 'better-sqlite3'
 import type { Config } from '../types.js'
 import { getStamp, updateStampStatus } from '../db/stamps.js'
@@ -13,10 +13,11 @@ type UpgradeTimestampErr       = { error: 'not_found' | 'calendar_error' | 'stor
 
 function checkBitcoinConfirmation(bytes: Buffer): { confirmed: boolean; block?: number } {
   try {
-    const proof = deserializeOTS(new Uint8Array(bytes))
-    const confirmed = hasConfirmedAttestation(proof.attestations)
-    if (confirmed) {
-      const block = getEarliestBitcoinBlock(proof.attestations)
+    const proof = DetachedTimestampFile.deserialize(new Uint8Array(bytes))
+    const attestations = proof.timestamp.getAttestations()
+    const bitcoin = attestations.filter(a => a.kind === 'bitcoin')
+    if (bitcoin.length > 0) {
+      const block = Math.min(...bitcoin.map(a => (a as any).height as number))
       return { confirmed: true, block }
     }
     return { confirmed: false }

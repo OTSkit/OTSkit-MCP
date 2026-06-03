@@ -1,6 +1,6 @@
 {
   "name": "@otskit/mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "OpenTimestamps MCP server — stamp, upgrade, verify via AI agents",
   "type": "module",
   "engines": { "node": ">=18" },

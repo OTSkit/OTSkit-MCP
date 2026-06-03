@@ -1,5 +1,5 @@
 import { readFileSync, statSync } from 'fs'
-import { deserializeOTS, hasConfirmedAttestation, getEarliestBitcoinBlock } from '@otskit/core'
+import { DetachedTimestampFile } from '@otskit/core'
 import type { Database } from 'better-sqlite3'
 import type { Config } from '../types.js'
 import { getStamp } from '../db/stamps.js'
@@ -39,10 +39,14 @@ export function inspectTimestamp(
   let hasBitcoin = false
   let bitcoinBlock: number | null = null
   try {
-    const proof = deserializeOTS(new Uint8Array(proofBytes))
-    attestationCount = proof.attestations.length
-    hasBitcoin = hasConfirmedAttestation(proof.attestations)
-    if (hasBitcoin) bitcoinBlock = getEarliestBitcoinBlock(proof.attestations) ?? null
+    const proof = DetachedTimestampFile.deserialize(new Uint8Array(proofBytes))
+    const attestations = proof.timestamp.getAttestations()
+    attestationCount = attestations.length
+    hasBitcoin = attestations.some(a => a.kind === 'bitcoin')
+    if (hasBitcoin) {
+      const blocks = attestations.filter(a => a.kind === 'bitcoin').map(a => (a as any).height as number)
+      bitcoinBlock = blocks.length > 0 ? Math.min(...blocks) : null
+    }
   } catch {
     // prueba parcial o inválida — devolvemos lo que sabemos
   }
