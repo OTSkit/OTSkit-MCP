@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rtk *)",
+      "Bash(cargo build *)",
+      "Bash(cargo check *)",
+      "Bash(cargo test *)",
+      "Bash(cargo clippy *)",
+      "Bash(cargo run *)",
+      "Bash(cargo fmt *)",
+      "Bash(cargo metadata *)",
+      "Bash(npm run *)",
+      "Bash(npx *)",
+      "Bash(pnpm run *)",
+      "Bash(pnpm install *)",
+      "Bash(pnpm list *)",
+      "Bash(node *)",
+      "Bash(tsc *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git pull *)",
+      "Bash(git checkout *)",
+      "Bash(git switch *)",
+      "Bash(git merge *)",
+      "Bash(git rebase *)",
+      "Bash(git stash *)",
+      "Bash(git fetch *)",
+      "Bash(git clone *)",
+      "Bash(git init *)",
+      "Bash(git tag *)",
+      "Bash(git reset *)",
+      "Bash(git restore *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(rm *)",
+      "Bash(touch *)",
+      "Bash(chmod *)"
+    ],
+    "deny": []
+  }
+}
