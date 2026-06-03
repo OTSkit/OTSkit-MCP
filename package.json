@@ -14,8 +14,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@otskit/core": "file:../otskit-core",
-    "@otskit/client": "file:../otskit-client",
+    "@otskit/core": "^0.1.0",
+    "@otskit/client": "^0.1.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "better-sqlite3": "^12.10.0",
     "archiver": "^7.0.0"
