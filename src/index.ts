@@ -5,6 +5,7 @@ if (!command || command === '--help' || command === 'help') {
   process.stderr.write(`Usage: ots-mcp <command>
 Commands:
   serve           Start MCP server (stdio transport)
+  install-claude  Install MCP in Claude Desktop config (auto-setup)
   stamp <hash>    Stamp a SHA-256 hash
   upgrade <id>    Upgrade a pending stamp
   verify <id>     Verify a stamp
@@ -20,6 +21,11 @@ switch (command) {
   case 'serve': {
     const { runServer } = await import('./server.js')
     await runServer()
+    break
+  }
+  case 'install-claude': {
+    const { installClaude } = await import('./install-claude.js')
+    installClaude()
     break
   }
   case 'stamp':
