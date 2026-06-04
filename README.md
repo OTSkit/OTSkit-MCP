@@ -8,6 +8,8 @@ OpenTimestamps MCP server — stamp, upgrade, and verify Bitcoin timestamps via 
 
 Exposes a set of tools to any MCP-compatible agent so it can timestamp documents, monitor confirmation status, and verify proofs against the Bitcoin blockchain — all from a conversation.
 
+> **Note on confirmation times:** After stamping, a proof is `pending` until Bitcoin confirms it. This typically takes **10–60 minutes** but can take **several hours** during network congestion. Use `ots-mcp watch` or `upgrade_timestamp` to monitor. A pending status is not an error.
+
 ## Install
 
 ```bash
