@@ -31,7 +31,10 @@ switch (command) {
   }
   case 'watch': {
     const { watchPending } = await import('./tools/watch.js')
-    const interval = args[0] ? parseInt(args[0]) : 5
+    const parsed = args[0] ? parseInt(args[0], 10) : NaN
+    const interval = isNaN(parsed) || parsed < 1 ? 5 : parsed
+    if (args[0] && (isNaN(parsed) || parsed < 1))
+      process.stderr.write(`Argumento inválido "${args[0]}", usando intervalo por defecto: 5 min\n`)
     await watchPending(interval)
     break
   }

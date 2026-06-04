@@ -49,7 +49,7 @@ export async function runCli(command: string, args: string[]): Promise<void> {
         const statusStr = 'status' in result ? result.status : `error:${result.error}`
         process.stderr.write(`${record.id.slice(0, 8)}: ${statusStr}\n`)
       }
-      break
+      process.exit(0)
     }
     case 'backup': {
       const dest = args[0] ?? `ots-mcp-backup-${Date.now()}.sqlite`

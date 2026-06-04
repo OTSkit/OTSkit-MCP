@@ -9,6 +9,7 @@ import { verifyTimestamp } from './tools/verify-timestamp.js'
 import { inspectTimestamp } from './tools/inspect-timestamp.js'
 import { listPending } from './tools/list-pending.js'
 import { preserve } from './tools/preserve.js'
+import { openWatchWindow } from './tools/watch-window.js'
 import { TOOL_DEFINITIONS } from './tool-definitions.js'
 
 export async function runServer(): Promise<void> {
@@ -35,6 +36,7 @@ export async function runServer(): Promise<void> {
         case 'inspect_timestamp': result = inspectTimestamp(args as any, db, config); break
         case 'list_pending':      result = listPending(args as any, db, config); break
         case 'preserve':          result = await preserve(args as any, db, config); break
+        case 'watch':             result = openWatchWindow((args as any)?.interval_minutes); break
         default:
           return { content: [{ type: 'text', text: JSON.stringify({ error: 'unknown_tool', tool: name }) }], isError: true }
       }

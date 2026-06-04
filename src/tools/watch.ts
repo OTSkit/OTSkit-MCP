@@ -1,6 +1,5 @@
 import { getDb } from '../db/index.js'
 import { loadConfig } from '../config.js'
-import { upgradeTimestamp } from './upgrade-timestamp.js'
 
 export async function watchPending(intervalMinutes: number = 5): Promise<void> {
   const config = loadConfig()
@@ -8,26 +7,23 @@ export async function watchPending(intervalMinutes: number = 5): Promise<void> {
 
   process.stdout.write(`Watching pending stamps every ${intervalMinutes} min. Ctrl+C to stop.\n\n`)
 
-  async function tick() {
-    const rows = db.prepare(`SELECT id, hash, status FROM stamps WHERE status = 'pending'`).all() as Array<{id: string, hash: string, status: string}>
+  function tick() {
+    const rows = db.prepare(
+      `SELECT id, hash, status, attempt_count, bitcoin_block, confirmed_at FROM stamps WHERE status != 'confirmed' ORDER BY created_at DESC`
+    ).all() as Array<{ id: string; hash: string; status: string; attempt_count: number; bitcoin_block: number | null; confirmed_at: string | null }>
 
-    if (rows.length === 0) {
-      process.stdout.write(`${now()} All stamps confirmed.\n`)
-      process.exit(0)
-    }
+    const confirmed = db.prepare(`SELECT COUNT(*) as n FROM stamps WHERE status = 'confirmed'`).get() as { n: number }
 
-    process.stdout.write(`${now()} Checking ${rows.length} pending stamps...\n`)
+    process.stdout.write(`${now()} — ${rows.length} pendientes, ${confirmed.n} confirmados\n`)
 
     for (const row of rows) {
-      const result = await upgradeTimestamp({ id: row.id }, db, config)
-      if ('error' in result) {
-        process.stdout.write(`  ${row.id.slice(0,8)}... ERROR: ${result.error}\n`)
-      } else if (result.status === 'confirmed') {
-        process.stdout.write(`  ${row.id.slice(0,8)}... CONFIRMED block #${(result as any).bitcoin_block}\n`)
-      } else {
-        process.stdout.write(`  ${row.id.slice(0,8)}... pending (attempt ${(result as any).attempt_count})\n`)
-      }
+      process.stdout.write(`  ${row.id.slice(0, 8)}  ${row.status}  (${row.attempt_count} intentos)\n`)
     }
+
+    if (rows.length === 0) {
+      process.stdout.write(`  (ningún sello pendiente)\n`)
+    }
+
     process.stdout.write('\n')
   }
 
@@ -35,6 +31,10 @@ export async function watchPending(intervalMinutes: number = 5): Promise<void> {
     return new Date().toISOString().replace('T', ' ').slice(0, 19)
   }
 
-  await tick()
-  setInterval(tick, intervalMinutes * 60 * 1000)
+  function loop() {
+    tick()
+    setTimeout(loop, Math.max(60_000, intervalMinutes * 60 * 1000))
+  }
+
+  loop()
 }

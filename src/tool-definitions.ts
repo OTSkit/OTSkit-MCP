@@ -79,6 +79,22 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
+    name: 'watch',
+    description: 'Opens a new terminal window that monitors pending stamps in real-time, polling at the given interval. The window stays open so the user can watch progress.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        interval_minutes: { type: 'number', description: 'Polling interval in minutes (default: 5, minimum: 1)' },
+      },
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: false,
+    },
+  },
+  {
     name: 'preserve',
     description: 'FILESYSTEM-SENSITIVE: Compresses a directory to ZIP, stamps its SHA-256 hash, stores archive in whitelist directory. Requires preserve_whitelist config.',
     inputSchema: {
