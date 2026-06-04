@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/OTSkit/OTSkit-MCP/compare/v1.0.0...v1.0.1) (2026-06-04)
+
+
+### Bug Fixes
+
+* distinguish calendar vs bitcoin attestations in inspect_timestamp ([1ef5560](https://github.com/OTSkit/OTSkit-MCP/commit/1ef556001501b1933bfa64c689f811b2c10c9d33))
+
 # 1.0.0 (2026-06-04)
 
 
