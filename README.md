@@ -14,13 +14,14 @@ Exposes a set of tools to any MCP-compatible agent so it can timestamp documents
 npm install -g @otskit/mcp
 ```
 
-## Claude Desktop setup
+## Agent setup
 
 ```bash
-ots-mcp install-claude
+ots-mcp setup claude   # Claude Desktop
+ots-mcp setup codex    # Codex CLI
 ```
 
-This writes the MCP server entry into `claude_desktop_config.json` automatically. Restart Claude Desktop afterwards.
+Each command writes the MCP entry into the agent's config file, makes a `.bak` backup if the file already exists, and skips if `ots-mcp` is already configured. Restart the agent afterwards to apply the changes.
 
 ## CLI commands
 
@@ -35,7 +36,7 @@ This writes the MCP server entry into `claude_desktop_config.json` automatically
 | `ots-mcp check-pending` | Run one upgrade pass over all pending stamps |
 | `ots-mcp scheduler install\|remove\|status` | Manage OS-level scheduler for auto-upgrades |
 | `ots-mcp backup [dest]` | Backup the SQLite database |
-| `ots-mcp install-claude` | Auto-configure Claude Desktop |
+| `ots-mcp setup <claude\|codex>` | Configure MCP for an agent |
 
 ## MCP tools exposed to Claude
 

@@ -5,7 +5,7 @@ if (!command || command === '--help' || command === 'help') {
   process.stderr.write(`Usage: ots-mcp <command>
 Commands:
   serve              Start MCP server (stdio transport)
-  install-claude     Install MCP in Claude Desktop config (auto-setup)
+  setup <target>     Configure MCP for an agent (claude | codex)
   watch [interval]   Watch pending stamps in real-time (default: 5 min)
   stamp <hash>       Stamp a SHA-256 hash
   upgrade <id>       Upgrade a pending stamp
@@ -22,6 +22,21 @@ switch (command) {
   case 'serve': {
     const { runServer } = await import('./server.js')
     await runServer()
+    break
+  }
+  case 'setup': {
+    const target = args[0]
+    if (!target || (target !== 'claude' && target !== 'codex')) {
+      process.stderr.write(`Usage: ots-mcp setup <claude|codex>\n`)
+      process.exit(1)
+    }
+    if (target === 'claude') {
+      const { setupClaude } = await import('./setup/claude.js')
+      setupClaude()
+    } else {
+      const { setupCodex } = await import('./setup/codex.js')
+      setupCodex()
+    }
     break
   }
   case 'install-claude': {
