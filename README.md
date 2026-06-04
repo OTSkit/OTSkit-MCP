@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/header.png" alt="OTSkit.ts MCP" width="480" />
+  <img src="https://raw.githubusercontent.com/OTSkit/OTSkit-MCP/master/docs/header.png" alt="OTSkit.ts MCP" width="480" />
 </p>
 
 # @otskit/mcp
