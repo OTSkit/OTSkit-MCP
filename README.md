@@ -4,9 +4,9 @@
 
 # @otskit/mcp
 
-OpenTimestamps MCP server — stamp, upgrade, and verify Bitcoin timestamps via AI agents (Claude).
+OpenTimestamps MCP server — stamp, upgrade, and verify Bitcoin timestamps via AI agents.
 
-Exposes a set of tools to Claude so it can timestamp documents, monitor confirmation status, and verify proofs against the Bitcoin blockchain — all from a conversation.
+Exposes a set of tools to any MCP-compatible agent so it can timestamp documents, monitor confirmation status, and verify proofs against the Bitcoin blockchain — all from a conversation.
 
 ## Install
 
@@ -46,7 +46,6 @@ This writes the MCP server entry into `claude_desktop_config.json` automatically
 | `verify_timestamp` | Verify a stamp — proves hash existed before a given Bitcoin block |
 | `inspect_timestamp` | Inspect a stored proof file without network calls |
 | `list_pending` | List stamps with status, retry count, and filters |
-| `preserve` | ZIP a directory, stamp its hash, store the archive |
 | `watch` | Open a terminal window monitoring pending stamps in real-time |
 
 ## Data directory
@@ -98,4 +97,3 @@ npm test         # run tests
 - [`@otskit/client`](https://github.com/AlexAlves87/otskit-client) — OTS calendar client
 - [`@modelcontextprotocol/sdk`](https://github.com/modelcontextprotocol/typescript-sdk) — MCP SDK
 - `better-sqlite3` — local database
-- `archiver` — ZIP support

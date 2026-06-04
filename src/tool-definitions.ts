@@ -94,22 +94,4 @@ export const TOOL_DEFINITIONS = [
       openWorldHint: false,
     },
   },
-  {
-    name: 'preserve',
-    description: 'FILESYSTEM-SENSITIVE: Compresses a directory to ZIP, stamps its SHA-256 hash, stores archive in whitelist directory. Requires preserve_whitelist config.',
-    inputSchema: {
-      type: 'object' as const,
-      properties: {
-        dir_path: { type: 'string', description: 'Absolute path to directory (must be in preserve_whitelist)' },
-        label:    { type: 'string', description: 'Optional label for the archive filename' },
-      },
-      required: ['dir_path'],
-    },
-    annotations: {
-      readOnlyHint: false,
-      destructiveHint: false,
-      idempotentHint: false,
-      openWorldHint: true,
-    },
-  },
 ]
