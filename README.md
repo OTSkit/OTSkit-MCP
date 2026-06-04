@@ -38,7 +38,7 @@ Each command writes the MCP entry into the agent's config file, makes a `.bak` b
 | `ots-mcp backup [dest]` | Backup the SQLite database |
 | `ots-mcp setup <claude\|codex>` | Configure MCP for an agent |
 
-## MCP tools exposed to Claude
+## MCP tools exposed to agents
 
 | Tool | Description |
 |---|---|
@@ -67,10 +67,6 @@ Create `~/.ots-mcp/config.json` to override defaults:
 ```json
 {
   "stamp_enabled": true,
-  "preserve_enabled": true,
-  "preserve_whitelist": ["/path/to/allowed/dir"],
-  "preserve_max_bytes": 104857600,
-  "preserve_max_files": 10000,
   "scheduler_interval_minutes": 30,
   "retry_max_attempts": 20,
   "calendar_timeout_ms": 10000,
