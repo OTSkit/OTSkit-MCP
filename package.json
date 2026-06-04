@@ -1,16 +1,22 @@
 {
   "name": "@otskit/mcp",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "OpenTimestamps MCP server — stamp, upgrade, verify via AI agents",
   "type": "module",
-  "engines": { "node": ">=18" },
-  "bin": { "ots-mcp": "dist/index.js" },
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "ots-mcp": "dist/index.js"
+  },
   "exports": "./dist/index.js",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --clean",
-    "dev":   "tsup src/index.ts --format esm --watch",
-    "test":  "vitest run",
+    "dev": "tsup src/index.ts --format esm --watch",
+    "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
@@ -20,7 +26,10 @@
     "better-sqlite3": "^12.10.0"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["better-sqlite3", "esbuild"]
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild"
+    ]
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
