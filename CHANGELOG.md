@@ -1,3 +1,10 @@
+# [0.2.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.1.7...v0.2.0) (2026-06-04)
+
+
+### Features
+
+* add setup support for Claude Code CLI ([11856e2](https://github.com/OTSkit/OTSkit-MCP/commit/11856e29a39ffd43050253f3c1002440fb98fd51))
+
 ## [0.1.7](https://github.com/OTSkit/OTSkit-MCP/compare/v0.1.6...v0.1.7) (2026-06-04)
 
 
