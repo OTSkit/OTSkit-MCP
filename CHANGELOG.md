@@ -1,3 +1,10 @@
+## [0.1.7](https://github.com/OTSkit/OTSkit-MCP/compare/v0.1.6...v0.1.7) (2026-06-04)
+
+
+### Bug Fixes
+
+* remove internal retry fields from list_pending tool response ([613a01f](https://github.com/OTSkit/OTSkit-MCP/commit/613a01f3cee574537e6d10045e3be1e90c4e385f))
+
 ## [1.0.1](https://github.com/OTSkit/OTSkit-MCP/compare/v1.0.0...v1.0.1) (2026-06-04)
 
 
