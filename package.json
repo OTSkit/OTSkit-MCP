@@ -1,7 +1,7 @@
 {
   "name": "@otskit/mcp",
   "mcpName": "io.github.AlexAlves87/otskit-mcp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "OpenTimestamps MCP server — stamp, upgrade, verify via AI agents",
   "type": "module",
   "engines": {
