@@ -55,7 +55,7 @@ export function updateStampStatus(db: Database, id: string, params: UpdateParams
 
 export function listStamps(
   db: Database,
-  params: { status?: StampStatus; limit: number; offset: number; older_than_hours?: number }
+  params: { status?: StampStatus; limit: number; offset: number; older_than_hours?: number; due_now?: boolean }
 ): { items: StampRecord[]; total: number } {
   const conds: string[] = []
   const vals: unknown[] = []
@@ -64,6 +64,10 @@ export function listStamps(
   if (params.older_than_hours) {
     const cutoff = new Date(Date.now() - params.older_than_hours * 3_600_000).toISOString()
     conds.push('created_at < ?'); vals.push(cutoff)
+  }
+  if (params.due_now) {
+    conds.push('(next_retry_at IS NULL OR next_retry_at <= ?)')
+    vals.push(new Date().toISOString())
   }
 
   const where = conds.length ? `WHERE ${conds.join(' AND ')}` : ''

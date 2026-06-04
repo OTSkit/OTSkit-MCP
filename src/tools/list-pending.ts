@@ -3,7 +3,7 @@ import type { Config, StampStatus } from '../types.js'
 import { listStamps } from '../db/stamps.js'
 
 export function listPending(
-  input: { status?: StampStatus; limit?: number; offset?: number; older_than_hours?: number },
+  input: { status?: StampStatus; limit?: number; offset?: number; older_than_hours?: number; due_now?: boolean },
   db: Database,
   _config: Config
 ) {
@@ -12,5 +12,6 @@ export function listPending(
     limit: Math.min(input.limit ?? 50, 200),
     offset: input.offset ?? 0,
     older_than_hours: input.older_than_hours,
+    due_now: input.due_now,
   })
 }

@@ -42,7 +42,7 @@ export async function runCli(command: string, args: string[]): Promise<void> {
       break
     }
     case 'check-pending': {
-      const { items } = listPending({ status: 'pending', limit: 200 }, db, config)
+      const { items } = listPending({ status: 'pending', limit: 200, due_now: true }, db, config)
       process.stderr.write(`Processing ${items.length} pending stamps...\n`)
       for (const record of items) {
         const result = await upgradeTimestamp({ id: record.id }, db, config)
