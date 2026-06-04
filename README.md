@@ -19,8 +19,9 @@ npm install -g @otskit/mcp
 ## Agent setup
 
 ```bash
-ots-mcp setup claude   # Claude Desktop
-ots-mcp setup codex    # Codex CLI
+ots-mcp setup claude        # Claude Desktop
+ots-mcp setup claude-code   # Claude Code CLI
+ots-mcp setup codex         # Codex CLI
 ```
 
 Each command writes the MCP entry into the agent's config file, makes a `.bak` backup if the file already exists, and skips if `ots-mcp` is already configured. Restart the agent afterwards to apply the changes.
@@ -38,7 +39,7 @@ Each command writes the MCP entry into the agent's config file, makes a `.bak` b
 | `ots-mcp check-pending` | Run one upgrade pass over all pending stamps |
 | `ots-mcp scheduler install\|remove\|status` | Manage OS-level scheduler for auto-upgrades |
 | `ots-mcp backup [dest]` | Backup the SQLite database |
-| `ots-mcp setup <claude\|codex>` | Configure MCP for an agent |
+| `ots-mcp setup <claude\|claude-code\|codex>` | Configure MCP for an agent |
 
 ## MCP tools exposed to agents
 
