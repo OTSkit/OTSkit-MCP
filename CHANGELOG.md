@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.2.0...v0.3.0) (2026-06-04)
+
+
+### Features
+
+* add MCP registry manifest for official registration ([550ada9](https://github.com/OTSkit/OTSkit-MCP/commit/550ada9dbde74258ac72794015b0918cc375fb95))
+
 # [0.2.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.1.7...v0.2.0) (2026-06-04)
 
 
