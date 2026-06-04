@@ -12,8 +12,9 @@ type InspectOk  = {
   created_at: string
   proof_path: string
   proof_size_bytes: number
-  attestation_count: number
-  has_bitcoin_confirmation: boolean
+  calendar_attestations: number
+  bitcoin_attestations: number
+  bitcoin_confirmed: boolean
   bitcoin_block: number | null
 }
 
@@ -35,15 +36,15 @@ export function inspectTimestamp(
     return { error: 'proof_missing', details: `Cannot read proof: ${record.proof_path}` }
   }
 
-  let attestationCount = 0
-  let hasBitcoin = false
+  let calendarAttestations = 0
+  let bitcoinAttestations = 0
   let bitcoinBlock: number | null = null
   try {
     const proof = DetachedTimestampFile.deserialize(new Uint8Array(proofBytes))
     const attestations = proof.timestamp.getAttestations()
-    attestationCount = attestations.length
-    hasBitcoin = attestations.some(a => a.kind === 'bitcoin')
-    if (hasBitcoin) {
+    bitcoinAttestations = attestations.filter(a => a.kind === 'bitcoin').length
+    calendarAttestations = attestations.filter(a => a.kind !== 'bitcoin').length
+    if (bitcoinAttestations > 0) {
       const blocks = attestations.filter(a => a.kind === 'bitcoin').map(a => (a as any).height as number)
       bitcoinBlock = blocks.length > 0 ? Math.min(...blocks) : null
     }
@@ -58,8 +59,9 @@ export function inspectTimestamp(
     created_at: record.created_at,
     proof_path: record.proof_path,
     proof_size_bytes: proofSize,
-    attestation_count: attestationCount,
-    has_bitcoin_confirmation: hasBitcoin,
+    calendar_attestations: calendarAttestations,
+    bitcoin_attestations: bitcoinAttestations,
+    bitcoin_confirmed: bitcoinAttestations > 0,
     bitcoin_block: bitcoinBlock,
   }
 }

@@ -46,7 +46,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'inspect_timestamp',
-    description: 'Shows the contents of a stored proof file without making any network calls. Useful for debugging: returns size, parsed attestations, and confirmation status from the proof itself.',
+    description: 'Inspects a stored proof file without network calls. Returns calendar_attestations (promises from OTS servers, NOT Bitcoin confirmation) and bitcoin_attestations (actual Bitcoin blocks). A stamp is only truly confirmed when bitcoin_attestations > 0 and bitcoin_confirmed is true.',
     inputSchema: {
       type: 'object' as const,
       properties: { id: { type: 'string', description: 'UUID from the stamp record' } },
