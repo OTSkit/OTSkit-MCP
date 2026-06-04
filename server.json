@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.otskit/otskit-mcp",
+  "description": "OpenTimestamps MCP server — stamp, upgrade, and verify Bitcoin timestamps from AI agents. No API keys required, uses public OTS calendars and Blockstream Esplora.",
+  "repository": {
+    "url": "https://github.com/OTSkit/OTSkit-MCP",
+    "source": "github"
+  },
+  "version": "0.2.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@otskit/mcp",
+      "version": "0.2.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": []
+    }
+  ]
+}
