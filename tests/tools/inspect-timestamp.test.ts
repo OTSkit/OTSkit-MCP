@@ -6,12 +6,6 @@ import { insertStamp } from '../../src/db/stamps.js'
 import { inspectTimestamp } from '../../src/tools/inspect-timestamp.js'
 import type { Config } from '../../src/types.js'
 
-vi.mock('@alexalves87/opentimestamps', () => ({
-  deserializeOTS: vi.fn().mockReturnValue({ attestations: [] }),
-  hasConfirmedAttestation: vi.fn().mockReturnValue(false),
-  getEarliestBitcoinBlock: vi.fn().mockReturnValue(undefined),
-}))
-
 const MOCK_CONFIG: Config = {
   stamp_enabled: true, preserve_enabled: true, preserve_whitelist: [],
   preserve_max_bytes: 104_857_600, preserve_max_files: 10_000,
