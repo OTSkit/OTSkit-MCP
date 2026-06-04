@@ -16,7 +16,7 @@ importers:
         version: 0.1.2
       '@otskit/core':
         specifier: ^0.1.0
-        version: 0.1.0
+        version: 0.1.1
       better-sqlite3:
         specifier: ^12.10.0
         version: 12.10.0
@@ -459,8 +459,8 @@ packages:
     resolution: {integrity: sha512-TMRkyPWbVyrCGo62Da0SkzOEIq2O7FPp1xnsP0R8CDTyXUZBOLkbVtTNHir+t+GZsrSQR5LP/l/EZIHcRXhNVA==}
     engines: {node: '>=18.0.0'}
 
-  '@otskit/core@0.1.0':
-    resolution: {integrity: sha512-LUlI4wBpc8yum4tM084+eHwNhcMIJVg57hPrNghVBRrY7jAGYbsIPG5qShP9eeSyjBR4OLP6zB06guwcfhWGcQ==}
+  '@otskit/core@0.1.1':
+    resolution: {integrity: sha512-1mInl91ENb9TzBHI1lHUW57S4JwLSKc9o0XDWCri3Ei+INiSA+7I/LdWqLEBW74Qkgbndwth9U6MmdSROs/Stw==}
     engines: {node: '>=20.0.0'}
 
   '@pnpm/config.env-replace@1.1.0':
@@ -2757,7 +2757,7 @@ snapshots:
 
   '@otskit/client@0.1.2': {}
 
-  '@otskit/core@0.1.0': {}
+  '@otskit/core@0.1.1': {}
 
   '@pnpm/config.env-replace@1.1.0': {}
 
