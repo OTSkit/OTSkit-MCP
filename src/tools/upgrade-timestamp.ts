@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs'
 import { OpenTimestampsClient, UpgradeError } from '@otskit/client'
-import { DetachedTimestampFile } from '@otskit/core'
+import { DetachedTimestampFile, StreamDeserializationContext } from '@otskit/core'
 import type { Database } from 'better-sqlite3'
 import type { Config } from '../types.js'
 import { getStamp, updateStampStatus } from '../db/stamps.js'
@@ -11,16 +11,23 @@ type UpgradeTimestampConfirmed = { id: string; status: 'confirmed'; bitcoin_bloc
 type UpgradeTimestampPending   = { id: string; status: 'pending'; attempt_count: number; last_attempt_at: string; next_retry_at: string }
 type UpgradeTimestampErr       = { error: 'not_found' | 'calendar_error' | 'storage_error'; details: string }
 
+function collectAttestations(ts: any): any[] {
+  const atts = [...ts.attestations]
+  for (const branch of ts.branches) {
+    atts.push(...collectAttestations(branch.stamp))
+  }
+  return atts
+}
+
 function checkBitcoinConfirmation(bytes: Buffer): { confirmed: boolean; block?: number } {
   try {
-    const proof = DetachedTimestampFile.deserialize(new Uint8Array(bytes))
-    const attestations = proof.timestamp.getAttestations()
-    const bitcoin = attestations.filter(a => a.kind === 'bitcoin')
-    if (bitcoin.length > 0) {
-      const block = Math.min(...bitcoin.map(a => (a as any).height as number))
-      return { confirmed: true, block }
-    }
-    return { confirmed: false }
+    const ctx = new StreamDeserializationContext(new Uint8Array(bytes))
+    const dtf = DetachedTimestampFile.deserialize(ctx)
+    const attestations = collectAttestations(dtf.timestamp)
+    const bitcoinAtts = attestations.filter((a: any) => a.kind === 'bitcoin')
+    if (bitcoinAtts.length === 0) return { confirmed: false }
+    const block = Math.min(...bitcoinAtts.map((a: any) => a.height as number))
+    return { confirmed: true, block }
   } catch {
     return { confirmed: false }
   }
