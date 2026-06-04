@@ -4,15 +4,16 @@ const [,, command, ...args] = process.argv
 if (!command || command === '--help' || command === 'help') {
   process.stderr.write(`Usage: ots-mcp <command>
 Commands:
-  serve           Start MCP server (stdio transport)
-  install-claude  Install MCP in Claude Desktop config (auto-setup)
-  stamp <hash>    Stamp a SHA-256 hash
-  upgrade <id>    Upgrade a pending stamp
-  verify <id>     Verify a stamp
-  list [status]   List stamps (default: pending)
-  check-pending   Run pending upgrades (for scheduler)
-  backup [dest]   Backup the SQLite database
-  scheduler       Manage OS scheduler (install|remove|status)
+  serve              Start MCP server (stdio transport)
+  install-claude     Install MCP in Claude Desktop config (auto-setup)
+  watch [interval]   Watch pending stamps in real-time (default: 5 min)
+  stamp <hash>       Stamp a SHA-256 hash
+  upgrade <id>       Upgrade a pending stamp
+  verify <id>        Verify a stamp
+  list [status]      List stamps (default: pending)
+  check-pending      Run pending upgrades (for scheduler)
+  backup [dest]      Backup the SQLite database
+  scheduler          Manage OS scheduler (install|remove|status)
 `)
   process.exit(command ? 0 : 1)
 }
@@ -26,6 +27,12 @@ switch (command) {
   case 'install-claude': {
     const { installClaude } = await import('./install-claude.js')
     installClaude()
+    break
+  }
+  case 'watch': {
+    const { watchPending } = await import('./tools/watch.js')
+    const interval = args[0] ? parseInt(args[0]) : 5
+    await watchPending(interval)
     break
   }
   case 'stamp':
