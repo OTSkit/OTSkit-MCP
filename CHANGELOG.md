@@ -1,3 +1,10 @@
+## [0.6.4](https://github.com/OTSkit/OTSkit-MCP/compare/v0.6.3...v0.6.4) (2026-06-05)
+
+
+### Bug Fixes
+
+* defer all filesystem access until first tool call ([4bbefb5](https://github.com/OTSkit/OTSkit-MCP/commit/4bbefb5e578e5deafbfac2485a91f6666dbfd359))
+
 ## [0.6.3](https://github.com/OTSkit/OTSkit-MCP/compare/v0.6.2...v0.6.3) (2026-06-05)
 
 
