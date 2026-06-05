@@ -79,6 +79,21 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
+    name: 'hash_file',
+    description: 'Computes the SHA-256 hash of a local file and returns it as a 64-character hex string. No network calls — pure local operation.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: { path: { type: 'string', description: 'Absolute path to the file' } },
+      required: ['path'],
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  {
     name: 'stamp_file',
     description: 'Stamps a file against public OpenTimestamps calendars. Computes SHA-256 of the file and stamps it on Bitcoin. IMPORTANT: the digest is sent to external calendar servers (alice.btc, bob.btc, finney, catallaxy).',
     inputSchema: {

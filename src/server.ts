@@ -10,6 +10,7 @@ import { inspectTimestamp } from './tools/inspect-timestamp.js'
 import { listPending } from './tools/list-pending.js'
 import { openWatchWindow } from './tools/watch-window.js'
 import { stampFile } from './tools/stamp-file.js'
+import { hashFileTool } from './tools/hash-file.js'
 import { TOOL_DEFINITIONS } from './tool-definitions.js'
 
 export async function runServer(): Promise<void> {
@@ -35,6 +36,7 @@ export async function runServer(): Promise<void> {
         case 'verify_timestamp':  result = await verifyTimestamp(args as any, db, config); break
         case 'inspect_timestamp': result = inspectTimestamp(args as any, db, config); break
         case 'list_pending':      result = listPending(args as any, db, config); break
+        case 'hash_file':         result = await hashFileTool(args as any); break
         case 'stamp_file':        result = await stampFile(args as any, db, config); break
         case 'watch':             result = openWatchWindow((args as any)?.interval_minutes); break
         default:
