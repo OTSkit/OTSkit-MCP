@@ -49,6 +49,11 @@ export async function runServer(): Promise<void> {
     }
   })
 
+  const exit = () => { db.close(); process.exit(0) }
+  process.stdin.on('close', exit)
+  process.on('SIGTERM', exit)
+  process.on('SIGINT', exit)
+
   const transport = new StdioServerTransport()
   await server.connect(transport)
 }
