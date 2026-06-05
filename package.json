@@ -4,6 +4,11 @@
   "version": "0.4.2",
   "license": "MIT",
   "description": "OpenTimestamps MCP server — stamp, upgrade, verify via AI agents",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OTSkit/OTSkit-MCP.git"
+  },
+  "homepage": "https://github.com/OTSkit/OTSkit-MCP#readme",
   "type": "module",
   "engines": {
     "node": ">=18"
