@@ -1,12 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import Database from 'better-sqlite3'
+import { makeRawDb } from '../helpers/db.js'
+import type { DatabaseLike } from '../../src/db/driver.js'
 import { initDb } from '../../src/db/schema.js'
 import { insertStamp, getStamp, updateStampStatus, listStamps } from '../../src/db/stamps.js'
 
-let db: ReturnType<typeof Database>
+let db: DatabaseLike
 
 beforeEach(() => {
-  db = new Database(':memory:')
+  db = makeRawDb()
   initDb(db)
 })
 

@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs'
 import { OpenTimestampsClient, UpgradeError } from '@otskit/client'
 import { DetachedTimestampFile, StreamDeserializationContext } from '@otskit/core'
-import type { Database } from 'better-sqlite3'
+import type { DatabaseLike } from '../db/driver.js'
 import type { Config } from '../types.js'
 import { getStamp, updateStampStatus } from '../db/stamps.js'
 import { logOperation } from '../db/operations-log.js'
@@ -41,7 +41,7 @@ function nextRetryAt(attemptCount: number): string {
 
 export async function upgradeTimestamp(
   input: { id: string },
-  db: Database,
+  db: DatabaseLike,
   config: Config
 ): Promise<UpgradeTimestampConfirmed | UpgradeTimestampPending | UpgradeTimestampErr> {
   const record = getStamp(db, input.id)

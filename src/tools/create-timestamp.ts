@@ -2,7 +2,7 @@ import { mkdirSync } from 'fs'
 import { join } from 'path'
 import { randomUUID } from 'crypto'
 import { OpenTimestampsClient } from '@otskit/client'
-import type { Database } from 'better-sqlite3'
+import type { DatabaseLike } from '../db/driver.js'
 import type { Config } from '../types.js'
 import { getDataDir } from '../config.js'
 import { insertStamp } from '../db/stamps.js'
@@ -22,7 +22,7 @@ type CreateTimestampError = {
 
 export async function createTimestamp(
   input: { hash: string },
-  db: Database,
+  db: DatabaseLike,
   config: Config
 ): Promise<CreateTimestampSuccess | CreateTimestampError> {
   if (!HEX64.test(input.hash)) {

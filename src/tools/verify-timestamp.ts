@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs'
 import { OpenTimestampsClient } from '@otskit/client'
-import type { Database } from 'better-sqlite3'
+import type { DatabaseLike } from '../db/driver.js'
 import type { Config } from '../types.js'
 import { getStamp } from '../db/stamps.js'
 import { logOperation } from '../db/operations-log.js'
@@ -15,7 +15,7 @@ type VerifyTimestampResult =
 
 export async function verifyTimestamp(
   input: { id: string },
-  db: Database,
+  db: DatabaseLike,
   config: Config
 ): Promise<VerifyTimestampResult> {
   const record = getStamp(db, input.id)

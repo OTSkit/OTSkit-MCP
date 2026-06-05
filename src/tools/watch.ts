@@ -3,16 +3,16 @@ import { loadConfig } from '../config.js'
 
 export async function watchPending(intervalMinutes: number = 5): Promise<void> {
   const config = loadConfig()
-  const db = getDb(config)
+  const db = getDb()
 
   process.stdout.write(`Watching pending stamps every ${intervalMinutes} min. Ctrl+C to stop.\n\n`)
 
   function tick() {
-    const rows = db.prepare(
+    const rows = db.all(
       `SELECT id, hash, status, attempt_count, bitcoin_block, confirmed_at FROM stamps WHERE status != 'confirmed' ORDER BY created_at DESC`
-    ).all() as Array<{ id: string; hash: string; status: string; attempt_count: number; bitcoin_block: number | null; confirmed_at: string | null }>
+    ) as Array<{ id: string; hash: string; status: string; attempt_count: number; bitcoin_block: number | null; confirmed_at: string | null }>
 
-    const confirmed = db.prepare(`SELECT COUNT(*) as n FROM stamps WHERE status = 'confirmed'`).get() as { n: number }
+    const confirmed = db.get(`SELECT COUNT(*) as n FROM stamps WHERE status = 'confirmed'`) as { n: number }
 
     process.stdout.write(`${now()} — ${rows.length} pendientes, ${confirmed.n} confirmados\n`)
 

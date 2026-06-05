@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import Database from 'better-sqlite3'
+import { makeRawDb } from '../helpers/db.js'
+import type { DatabaseLike } from '../../src/db/driver.js'
 import { writeFileSync, mkdirSync } from 'fs'
 import { initDb } from '../../src/db/schema.js'
 import { insertStamp } from '../../src/db/stamps.js'
@@ -15,7 +16,6 @@ vi.mock('@otskit/client', () => {
   }
 })
 
-// Mock core library: no bitcoin attestation
 vi.mock('@otskit/core', () => ({
   deserializeOTS: vi.fn().mockReturnValue({ attestations: [] }),
   hasConfirmedAttestation: vi.fn().mockReturnValue(false),
@@ -30,12 +30,12 @@ const MOCK_CONFIG: Config = {
   log_file: '/tmp/test.log', calendars: [], esplora_url: 'https://blockstream.info/api',
 }
 
-let db: ReturnType<typeof Database>
+let db: DatabaseLike
 
 beforeEach(() => {
   process.env.OTS_MCP_DATA_DIR = `/tmp/ots-upgrade-test-${Date.now()}`
   mkdirSync(process.env.OTS_MCP_DATA_DIR + '/proofs', { recursive: true })
-  db = new Database(':memory:')
+  db = makeRawDb()
   initDb(db)
 })
 afterEach(() => { delete process.env.OTS_MCP_DATA_DIR })

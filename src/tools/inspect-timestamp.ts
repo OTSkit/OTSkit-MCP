@@ -1,6 +1,6 @@
 import { readFileSync, statSync } from 'fs'
 import { DetachedTimestampFile } from '@otskit/core'
-import type { Database } from 'better-sqlite3'
+import type { DatabaseLike } from '../db/driver.js'
 import type { Config } from '../types.js'
 import { getStamp } from '../db/stamps.js'
 
@@ -20,7 +20,7 @@ type InspectOk  = {
 
 export function inspectTimestamp(
   input: { id: string },
-  db: Database,
+  db: DatabaseLike,
   _config: Config
 ): InspectOk | InspectErr {
   const record = getStamp(db, input.id)

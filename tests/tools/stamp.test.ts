@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import Database from 'better-sqlite3'
+import { makeRawDb } from '../helpers/db.js'
+import type { DatabaseLike } from '../../src/db/driver.js'
 import { mkdirSync } from 'fs'
 import { initDb } from '../../src/db/schema.js'
 import { createTimestamp } from '../../src/tools/create-timestamp.js'
@@ -21,12 +22,12 @@ const MOCK_CONFIG: Config = {
   esplora_url: 'https://blockstream.info/api',
 }
 
-let db: ReturnType<typeof Database>
+let db: DatabaseLike
 
 beforeEach(() => {
   process.env.OTS_MCP_DATA_DIR = `/tmp/ots-stamp-test-${Date.now()}`
   mkdirSync(process.env.OTS_MCP_DATA_DIR + '/proofs', { recursive: true })
-  db = new Database(':memory:')
+  db = makeRawDb()
   initDb(db)
 })
 afterEach(() => { delete process.env.OTS_MCP_DATA_DIR })

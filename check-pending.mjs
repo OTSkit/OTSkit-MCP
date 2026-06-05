@@ -1,12 +1,15 @@
-import DB from 'better-sqlite3'
+import { createRequire } from 'module'
 import os from 'os'
 
-const db = new DB(os.homedir() + '/.ots-mcp/db.sqlite', { readonly: true })
-const rows = db.prepare(`
+const _require = createRequire(import.meta.url)
+const { Database } = _require('node-sqlite3-wasm')
+
+const db = new Database(os.homedir() + '/.ots-mcp/db.sqlite', { readOnly: true })
+const rows = db.all(`
   SELECT id, hash, status, created_at, attempt_count, last_attempt_at, last_error, next_retry_at
   FROM stamps WHERE status != 'confirmed'
   ORDER BY created_at ASC
-`).all()
+`)
 
 console.log(`Total no confirmados: ${rows.length}`)
 for (const r of rows) {
@@ -16,3 +19,5 @@ for (const r of rows) {
   if (r.last_error) console.log(`  ERROR: ${r.last_error}`)
   console.log(`  próximo retry: ${r.next_retry_at ?? 'no programado'}`)
 }
+
+db.close()

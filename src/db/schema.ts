@@ -1,21 +1,21 @@
-import type { Database } from 'better-sqlite3'
+import type { DatabaseLike } from './driver.js'
 
 export const CURRENT_VERSION = 1
 
-export function initDb(db: Database): void {
-  db.pragma('journal_mode = WAL')
-  db.pragma('busy_timeout = 5000')
-  db.pragma('foreign_keys = ON')
+export function initDb(db: DatabaseLike): void {
+  db.exec('PRAGMA busy_timeout = 5000')
+  db.exec('PRAGMA foreign_keys = ON')
   runMigrations(db)
 }
 
-function runMigrations(db: Database): void {
-  const version = db.pragma('user_version', { simple: true }) as number
-  if (version < 1) migrateTo1(db)
+function runMigrations(db: DatabaseLike): void {
+  const row = db.get('PRAGMA user_version') as { user_version: number }
+  if (row.user_version < 1) migrateTo1(db)
 }
 
-function migrateTo1(db: Database): void {
-  db.transaction(() => {
+function migrateTo1(db: DatabaseLike): void {
+  db.exec('BEGIN')
+  try {
     db.exec(`
       CREATE TABLE IF NOT EXISTS stamps (
         id              TEXT PRIMARY KEY,
@@ -49,6 +49,10 @@ function migrateTo1(db: Database): void {
       CREATE INDEX IF NOT EXISTS idx_oplog_stamp_id ON operations_log(stamp_id);
       CREATE INDEX IF NOT EXISTS idx_oplog_created  ON operations_log(created_at);
     `)
-    db.pragma('user_version = 1')
-  })()
+    db.exec('PRAGMA user_version = 1')
+    db.exec('COMMIT')
+  } catch (e) {
+    db.exec('ROLLBACK')
+    throw e
+  }
 }

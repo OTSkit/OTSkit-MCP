@@ -1,4 +1,4 @@
-import type { Database } from 'better-sqlite3'
+import type { DatabaseLike, SQLiteValue } from './driver.js'
 import type { StampRecord, StampStatus } from '../types.js'
 
 interface InsertParams {
@@ -20,20 +20,21 @@ interface UpdateParams {
   next_retry_at?: string
 }
 
-export function insertStamp(db: Database, params: InsertParams): StampRecord {
+export function insertStamp(db: DatabaseLike, params: InsertParams): StampRecord {
   const now = new Date().toISOString()
-  db.prepare(`
-    INSERT INTO stamps (id, hash, status, created_at, proof_path, archive_path, attempt_count, metadata)
-    VALUES (?, ?, 'pending', ?, ?, ?, 0, ?)
-  `).run(params.id, params.hash, now, params.proof_path, params.archive_path ?? null, params.metadata ?? null)
+  db.run(
+    `INSERT INTO stamps (id, hash, status, created_at, proof_path, archive_path, attempt_count, metadata)
+     VALUES (?, ?, 'pending', ?, ?, ?, 0, ?)`,
+    [params.id, params.hash, now, params.proof_path, params.archive_path ?? null, params.metadata ?? null]
+  )
   return getStamp(db, params.id)!
 }
 
-export function getStamp(db: Database, id: string): StampRecord | null {
-  return (db.prepare('SELECT * FROM stamps WHERE id = ?').get(id) as StampRecord | undefined) ?? null
+export function getStamp(db: DatabaseLike, id: string): StampRecord | null {
+  return (db.get('SELECT * FROM stamps WHERE id = ?', [id]) as StampRecord | null) ?? null
 }
 
-export function updateStampStatus(db: Database, id: string, params: UpdateParams): void {
+export function updateStampStatus(db: DatabaseLike, id: string, params: UpdateParams): void {
   const fields: string[] = []
   const values: unknown[] = []
 
@@ -50,15 +51,15 @@ export function updateStampStatus(db: Database, id: string, params: UpdateParams
 
   if (fields.length === 0) return
   values.push(id)
-  db.prepare(`UPDATE stamps SET ${fields.join(', ')} WHERE id = ?`).run(...values)
+  db.run(`UPDATE stamps SET ${fields.join(', ')} WHERE id = ?`, values)
 }
 
 export function listStamps(
-  db: Database,
+  db: DatabaseLike,
   params: { status?: StampStatus; limit: number; offset: number; older_than_hours?: number; due_now?: boolean }
 ): { items: StampRecord[]; total: number } {
   const conds: string[] = []
-  const vals: unknown[] = []
+  const vals: SQLiteValue[] = []
 
   if (params.status) { conds.push('status = ?'); vals.push(params.status) }
   if (params.older_than_hours) {
@@ -71,10 +72,12 @@ export function listStamps(
   }
 
   const where = conds.length ? `WHERE ${conds.join(' AND ')}` : ''
-  const total = (db.prepare(`SELECT COUNT(*) as n FROM stamps ${where}`).get(...vals) as { n: number }).n
-  const items = db.prepare(
-    `SELECT * FROM stamps ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`
-  ).all(...vals, params.limit, params.offset) as StampRecord[]
+  const countParams = vals.length ? vals : undefined
+  const total = (db.get(`SELECT COUNT(*) as n FROM stamps ${where}`, countParams) as { n: number }).n
+  const items = db.all(
+    `SELECT * FROM stamps ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+    [...vals, params.limit, params.offset]
+  ) as StampRecord[]
 
   return { items, total }
 }

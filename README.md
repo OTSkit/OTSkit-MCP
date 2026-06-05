@@ -107,4 +107,4 @@ npm test         # run tests
 - [`@otskit/core`](https://github.com/AlexAlves87/otskit-core) — OpenTimestamps core logic
 - [`@otskit/client`](https://github.com/AlexAlves87/otskit-client) — OTS calendar client
 - [`@modelcontextprotocol/sdk`](https://github.com/modelcontextprotocol/typescript-sdk) — MCP SDK
-- `better-sqlite3` — local database
+- `node-sqlite3-wasm` — local database (pure WASM, no native compilation)
