@@ -1,3 +1,10 @@
+## [0.6.3](https://github.com/OTSkit/OTSkit-MCP/compare/v0.6.2...v0.6.3) (2026-06-05)
+
+
+### Bug Fixes
+
+* lazy-init database so tools/list works without filesystem access ([a90aec6](https://github.com/OTSkit/OTSkit-MCP/commit/a90aec644368784bf864c7899048a0bc625a61fc))
+
 ## [0.6.2](https://github.com/OTSkit/OTSkit-MCP/compare/v0.6.1...v0.6.2) (2026-06-05)
 
 
