@@ -1,3 +1,10 @@
+## [0.6.2](https://github.com/OTSkit/OTSkit-MCP/compare/v0.6.1...v0.6.2) (2026-06-05)
+
+
+### Bug Fixes
+
+* include README.md and LICENSE in npm package files ([ab343b9](https://github.com/OTSkit/OTSkit-MCP/commit/ab343b9872591bf8e31973659af7868b820aa9be))
+
 ## [0.6.1](https://github.com/OTSkit/OTSkit-MCP/compare/v0.6.0...v0.6.1) (2026-06-05)
 
 
