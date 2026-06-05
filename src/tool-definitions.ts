@@ -79,6 +79,21 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
+    name: 'stamp_file',
+    description: 'Stamps a file against public OpenTimestamps calendars. Computes SHA-256 of the file and stamps it on Bitcoin. IMPORTANT: the digest is sent to external calendar servers (alice.btc, bob.btc, finney, catallaxy).',
+    inputSchema: {
+      type: 'object' as const,
+      properties: { path: { type: 'string', description: 'Absolute path to the file to stamp' } },
+      required: ['path'],
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  {
     name: 'watch',
     description: 'Opens a new terminal window that monitors pending stamps in real-time, polling at the given interval. The window stays open so the user can watch progress.',
     inputSchema: {
