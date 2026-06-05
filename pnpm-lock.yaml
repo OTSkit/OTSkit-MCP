@@ -18,7 +18,7 @@ importers:
         specifier: ^0.1.0
         version: 0.1.1
       node-sqlite3-wasm:
-        specifier: ^0.8.0
+        specifier: 0.8.57
         version: 0.8.57
     devDependencies:
       '@semantic-release/changelog':
