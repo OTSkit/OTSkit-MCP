@@ -1,3 +1,10 @@
+## [0.4.2](https://github.com/OTSkit/OTSkit-MCP/compare/v0.4.1...v0.4.2) (2026-06-05)
+
+
+### Bug Fixes
+
+* add missing license field to package.json ([6aaa29f](https://github.com/OTSkit/OTSkit-MCP/commit/6aaa29f769909c4d75a38ac92ee4b0393b08924a))
+
 ## [0.4.1](https://github.com/OTSkit/OTSkit-MCP/compare/v0.4.0...v0.4.1) (2026-06-05)
 
 
