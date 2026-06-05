@@ -1,3 +1,10 @@
+# [0.5.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.4.3...v0.5.0) (2026-06-05)
+
+
+### Features
+
+* add stamp_file tool to compute SHA-256 and stamp a file on Bitcoin ([76d53c7](https://github.com/OTSkit/OTSkit-MCP/commit/76d53c763ceaa6c271d517d2bc1f553bc165c2a0))
+
 ## [0.4.3](https://github.com/OTSkit/OTSkit-MCP/compare/v0.4.2...v0.4.3) (2026-06-05)
 
 
