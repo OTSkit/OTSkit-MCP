@@ -15,7 +15,6 @@ import { TOOL_DEFINITIONS } from './tool-definitions.js'
 
 export async function runServer(): Promise<void> {
   const config = loadConfig()
-  const db = getDb()
 
   const server = new Server(
     { name: 'ots-mcp', version: '0.1.0' },
@@ -28,6 +27,7 @@ export async function runServer(): Promise<void> {
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params
+    const db = getDb()
     try {
       let result: unknown
       switch (name) {
@@ -49,7 +49,7 @@ export async function runServer(): Promise<void> {
     }
   })
 
-  const exit = () => { db.close(); process.exit(0) }
+  const exit = () => { try { getDb().close() } catch {} process.exit(0) }
   process.stdin.on('close', exit)
   process.on('SIGTERM', exit)
   process.on('SIGINT', exit)
