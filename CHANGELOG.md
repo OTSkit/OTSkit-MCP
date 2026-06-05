@@ -1,3 +1,15 @@
+# [0.6.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.5.0...v0.6.0) (2026-06-05)
+
+
+### Bug Fixes
+
+* update @otskit/client dependency to ^0.2.0 in package.json ([a2e916b](https://github.com/OTSkit/OTSkit-MCP/commit/a2e916bf6121ebc9e91c22fb73e6dc7e5b85fb7a))
+
+
+### Features
+
+* add hash_file tool using @otskit/client@0.2.0 hashFile ([9980088](https://github.com/OTSkit/OTSkit-MCP/commit/998008899b2352c97d154a00967062e8322cbca1))
+
 # [0.5.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.4.3...v0.5.0) (2026-06-05)
 
 
