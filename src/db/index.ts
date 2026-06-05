@@ -5,13 +5,12 @@ import { getDataDir } from '../config.js'
 import { initDb } from './schema.js'
 import type { DatabaseLike } from './driver.js'
 
-const _require = createRequire(import.meta.url)
-const { Database } = _require('node-sqlite3-wasm') as { Database: new (path: string) => DatabaseLike }
-
 let _db: DatabaseLike | null = null
 
 export function getDb(): DatabaseLike {
   if (_db) return _db
+  const _require = createRequire(import.meta.url)
+  const { Database } = _require('node-sqlite3-wasm') as { Database: new (path: string) => DatabaseLike }
   const dir = getDataDir()
   mkdirSync(dir, { recursive: true })
   _db = new Database(join(dir, 'db.sqlite'))

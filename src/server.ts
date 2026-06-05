@@ -14,7 +14,8 @@ import { hashFileTool } from './tools/hash-file.js'
 import { TOOL_DEFINITIONS } from './tool-definitions.js'
 
 export async function runServer(): Promise<void> {
-  const config = loadConfig()
+  let config: ReturnType<typeof loadConfig> | null = null
+  const getConfig = () => { if (!config) config = loadConfig(); return config }
 
   const server = new Server(
     { name: 'ots-mcp', version: '0.1.0' },
@@ -28,6 +29,7 @@ export async function runServer(): Promise<void> {
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params
     const db = getDb()
+    const config = getConfig()
     try {
       let result: unknown
       switch (name) {
