@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/OTSkit/OTSkit-MCP/compare/v0.4.0...v0.4.1) (2026-06-05)
+
+
+### Bug Fixes
+
+* auto-update server.json version on release ([78e27dd](https://github.com/OTSkit/OTSkit-MCP/commit/78e27dd8aae4aa366b1ee544ca7ba145ccbf2923))
+
 # [0.4.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.3.0...v0.4.0) (2026-06-04)
 
 
