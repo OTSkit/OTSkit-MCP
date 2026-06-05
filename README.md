@@ -58,6 +58,8 @@ Each command writes the MCP entry into the agent's config file, makes a `.bak` b
 | `inspect_timestamp` | Inspect a stored proof file without network calls |
 | `list_pending` | List stamps with status, retry count, and filters |
 | `watch` | Open a terminal window monitoring pending stamps in real-time |
+| `hash_file` | Compute the SHA-256 of a local file and return it as a 64-char hex string (no network calls) |
+| `stamp_file` | Compute SHA-256 of a local file and stamp it on Bitcoin in one step |
 
 ## Data directory
 
