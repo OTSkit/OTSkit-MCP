@@ -1,3 +1,11 @@
+## [0.6.1](https://github.com/OTSkit/OTSkit-MCP/compare/v0.6.0...v0.6.1) (2026-06-05)
+
+
+### Bug Fixes
+
+* exit process cleanly when stdin closes or SIGTERM received ([d43fde3](https://github.com/OTSkit/OTSkit-MCP/commit/d43fde3541876d9b886b7608288d24ad2ded39f7))
+* replace better-sqlite3 with node-sqlite3-wasm for pure-WASM SQLite ([cdb594a](https://github.com/OTSkit/OTSkit-MCP/commit/cdb594adaad5c82bcaf70367e8c3d2fb4b6fc7c4))
+
 # [0.6.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.5.0...v0.6.0) (2026-06-05)
 
 
