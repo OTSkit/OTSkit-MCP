@@ -50,6 +50,7 @@ jobs:
         with:
           node-version: '22.x'
       - run: pnpm install
+      - run: pnpm build
       - run: pnpm exec semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
