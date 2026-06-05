@@ -1,3 +1,11 @@
+## [0.4.3](https://github.com/OTSkit/OTSkit-MCP/compare/v0.4.2...v0.4.3) (2026-06-05)
+
+
+### Bug Fixes
+
+* add repository and homepage fields to package.json ([f827bfa](https://github.com/OTSkit/OTSkit-MCP/commit/f827bfafb7d37f124170637276a65c09dbc3e837))
+* run build before semantic-release so dist/ is included in npm publish ([62cc592](https://github.com/OTSkit/OTSkit-MCP/commit/62cc592180e1bf8e2f1e6959cc4dfd85277b65ae))
+
 ## [0.4.2](https://github.com/OTSkit/OTSkit-MCP/compare/v0.4.1...v0.4.2) (2026-06-05)
 
 
