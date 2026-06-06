@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-const [,, command, ...args] = process.argv
+const [, , command, ...args] = process.argv
 
 if (!command || command === '--help' || command === 'help') {
   process.stderr.write(`Usage: ots-mcp <command>
 Commands:
   serve              Start MCP server (stdio transport)
   setup <target>     Configure MCP for an agent (claude | claude-code | codex)
-  watch [interval]   Watch pending stamps in real-time (default: 5 min)
+  watch [interval]   Watch and upgrade due pending stamps (default: 30 min, minimum: 15 min)
   stamp <hash>       Stamp a SHA-256 hash
   upgrade <id>       Upgrade a pending stamp
   verify <id>        Verify a stamp
@@ -48,11 +48,11 @@ switch (command) {
     break
   }
   case 'watch': {
-    const { watchPending } = await import('./tools/watch.js')
+    const { normalizeWatchInterval, watchPending } = await import('./tools/watch.js')
     const parsed = args[0] ? parseInt(args[0], 10) : NaN
-    const interval = isNaN(parsed) || parsed < 1 ? 5 : parsed
-    if (args[0] && (isNaN(parsed) || parsed < 1))
-      process.stderr.write(`Argumento inválido "${args[0]}", usando intervalo por defecto: 5 min\n`)
+    const interval = normalizeWatchInterval(isNaN(parsed) ? undefined : parsed)
+    if (args[0] && (isNaN(parsed) || parsed < 15))
+      process.stderr.write(`Invalid interval "${args[0]}", using ${interval} min\n`)
     await watchPending(interval)
     break
   }

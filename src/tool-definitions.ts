@@ -110,18 +110,18 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'watch',
-    description: 'Opens a new terminal window that monitors pending stamps in real-time, polling at the given interval. The window stays open so the user can watch progress.',
+    description: 'Opens a new terminal window that monitors pending stamps and attempts due upgrades at a safe interval. The window stays open so the user can watch progress.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        interval_minutes: { type: 'number', description: 'Polling interval in minutes (default: 5, minimum: 1)' },
+        interval_minutes: { type: 'number', description: 'Polling interval in minutes (default: 30, minimum: 15)' },
       },
     },
     annotations: {
-      readOnlyHint: true,
+      readOnlyHint: false,
       destructiveHint: false,
       idempotentHint: false,
-      openWorldHint: false,
+      openWorldHint: true,
     },
   },
 ]

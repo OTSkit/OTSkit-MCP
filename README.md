@@ -8,16 +8,16 @@
 [![npm version](https://img.shields.io/npm/v/@otskit/mcp.svg)](https://www.npmjs.com/package/@otskit/mcp)
 [![npm downloads](https://img.shields.io/npm/dt/@otskit/mcp.svg)](https://www.npmjs.com/package/@otskit/mcp)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6-blue.svg)](https://www.typescriptlang.org/)
-[![Node ≥20](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
+[![Node >=20](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Glama](https://glama.ai/mcp/servers/OTSkit/OTSkit-MCP/badges/score.svg)](https://glama.ai/mcp/servers/OTSkit/OTSkit-MCP)
 [![OTSkit-MCP MCP server](https://glama.ai/mcp/servers/OTSkit/OTSkit-MCP/badges/card.svg)](https://glama.ai/mcp/servers/OTSkit/OTSkit-MCP)
 
-OpenTimestamps MCP server — stamp, upgrade, and verify Bitcoin timestamps via AI agents.
+OpenTimestamps MCP server - stamp, upgrade, and verify Bitcoin timestamps via AI agents.
 
-Exposes a set of tools to any MCP-compatible agent so it can timestamp documents, monitor confirmation status, and verify proofs against the Bitcoin blockchain — all from a conversation.
+Exposes a set of tools to any MCP-compatible agent so it can timestamp documents, monitor confirmation status, and verify proofs against the Bitcoin blockchain - all from a conversation.
 
-> **Note on confirmation times:** After stamping, a proof is `pending` until Bitcoin confirms it. This typically takes **10–60 minutes** but can take **several hours** during network congestion. Use `ots-mcp watch` or `upgrade_timestamp` to monitor. A pending status is not an error.
+> **Note on confirmation times:** After stamping, a proof is `pending` until Bitcoin confirms it. This typically takes **~60 minutes** but can take **several hours** during network congestion. Use `ots-mcp watch` or `upgrade_timestamp` to monitor. A pending status is not an error.
 
 ## Install
 
@@ -44,7 +44,7 @@ Each command writes the MCP entry into the agent's config file, makes a `.bak` b
 | `ots-mcp upgrade <id>` | Check if a pending stamp has been confirmed |
 | `ots-mcp verify <id>` | Verify a stamp against Bitcoin |
 | `ots-mcp list [status]` | List stamps (`pending` / `confirmed` / `failed`) |
-| `ots-mcp watch [minutes]` | Poll pending stamps in real-time (default: 5 min) |
+| `ots-mcp watch [minutes]` | Monitor pending stamps and attempt due upgrades (default: 30 min, minimum: 15 min) |
 | `ots-mcp check-pending` | Run one upgrade pass over all pending stamps |
 | `ots-mcp scheduler install\|remove\|status` | Manage OS-level scheduler for auto-upgrades |
 | `ots-mcp backup [dest]` | Backup the SQLite database |
@@ -56,10 +56,10 @@ Each command writes the MCP entry into the agent's config file, makes a `.bak` b
 |---|---|
 | `create_timestamp` | Stamp a SHA-256 hash against 4 public OTS calendars |
 | `upgrade_timestamp` | Check if a pending stamp has been confirmed in Bitcoin |
-| `verify_timestamp` | Verify a stamp — proves hash existed before a given Bitcoin block |
+| `verify_timestamp` | Verify a stamp - proves hash existed before a given Bitcoin block |
 | `inspect_timestamp` | Inspect a stored proof file without network calls |
 | `list_pending` | List stamps with status, retry count, and filters |
-| `watch` | Open a terminal window monitoring pending stamps in real-time |
+| `watch` | Open a terminal window monitoring pending stamps and attempting due upgrades |
 | `hash_file` | Compute the SHA-256 of a local file and return it as a 64-char hex string (no network calls) |
 | `stamp_file` | Compute SHA-256 of a local file and stamp it on Bitcoin in one step |
 
@@ -67,7 +67,7 @@ Each command writes the MCP entry into the agent's config file, makes a `.bak` b
 
 All data is stored in `~/.ots-mcp/`:
 
-```
+```text
 ~/.ots-mcp/
   ots-mcp.db       # SQLite database (stamps, proof files)
   config.json      # Optional config overrides
@@ -104,7 +104,7 @@ npm test         # run tests
 
 ## Dependencies
 
-- [`@otskit/core`](https://github.com/AlexAlves87/otskit-core) — OpenTimestamps core logic
-- [`@otskit/client`](https://github.com/AlexAlves87/otskit-client) — OTS calendar client
-- [`@modelcontextprotocol/sdk`](https://github.com/modelcontextprotocol/typescript-sdk) — MCP SDK
-- `node-sqlite3-wasm` — local database (pure WASM, no native compilation)
+- [`@otskit/core`](https://github.com/AlexAlves87/otskit-core) - OpenTimestamps core logic
+- [`@otskit/client`](https://github.com/AlexAlves87/otskit-client) - OTS calendar client
+- [`@modelcontextprotocol/sdk`](https://github.com/modelcontextprotocol/typescript-sdk) - MCP SDK
+- `node-sqlite3-wasm` - local database (pure WASM, no native compilation)

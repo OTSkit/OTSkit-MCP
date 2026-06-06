@@ -1,7 +1,8 @@
 import { exec } from 'child_process'
+import { normalizeWatchInterval } from './watch.js'
 
-export function openWatchWindow(intervalMinutes: number = 5): { opened: boolean; interval_minutes: number; error?: string } {
-  const minutes = Math.max(1, Math.floor(intervalMinutes))
+export function openWatchWindow(intervalMinutes?: number): { opened: boolean; interval_minutes: number; error?: string } {
+  const minutes = normalizeWatchInterval(intervalMinutes)
   const cmd = `start powershell.exe -NoExit -Command "ots-mcp watch ${minutes}"`
   let errorMsg: string | undefined
   exec(cmd, { shell: 'cmd' }, (err) => {
