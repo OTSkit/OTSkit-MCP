@@ -3,23 +3,29 @@ import { makeRawDb } from '../helpers/db.js'
 import type { DatabaseLike } from '../../src/db/driver.js'
 import { writeFileSync, mkdirSync } from 'fs'
 import { initDb } from '../../src/db/schema.js'
-import { insertStamp } from '../../src/db/stamps.js'
+import { insertStamp, getStamp } from '../../src/db/stamps.js'
 import { upgradeTimestamp } from '../../src/tools/upgrade-timestamp.js'
 import type { Config } from '../../src/types.js'
 
-vi.mock('@otskit/client', () => {
+const { mockUpgrade, MockUpgradeError, mockDeserialize } = vi.hoisted(() => {
+  class MockUpgradeError extends Error {}
   return {
-    OpenTimestampsClient: vi.fn().mockImplementation(() => ({
-      upgrade: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
-    })),
-    UpgradeError: class UpgradeError extends Error {},
+    mockUpgrade: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
+    MockUpgradeError,
+    mockDeserialize: vi.fn().mockReturnValue({ timestamp: { attestations: [], branches: [] } }),
   }
 })
 
+vi.mock('@otskit/client', () => ({
+  OpenTimestampsClient: vi.fn().mockImplementation(() => ({
+    upgrade: mockUpgrade,
+  })),
+  UpgradeError: MockUpgradeError,
+}))
+
 vi.mock('@otskit/core', () => ({
-  deserializeOTS: vi.fn().mockReturnValue({ attestations: [] }),
-  hasConfirmedAttestation: vi.fn().mockReturnValue(false),
-  getEarliestBitcoinBlock: vi.fn().mockReturnValue(undefined),
+  DetachedTimestampFile: { deserialize: mockDeserialize },
+  StreamDeserializationContext: vi.fn().mockImplementation((bytes: Uint8Array) => bytes),
 }))
 
 const MOCK_CONFIG: Config = {
@@ -57,5 +63,23 @@ describe('upgrade', () => {
       expect(result.status).toBe('pending')
       expect(result.attempt_count).toBe(1)
     }
+  })
+
+  it('returns confirmed and updates DB when calendar fails but .ots already has bitcoin attestation', async () => {
+    mockUpgrade.mockRejectedValueOnce(new MockUpgradeError('calendar unavailable'))
+    mockDeserialize.mockReturnValueOnce({
+      timestamp: { attestations: [{ kind: 'bitcoin', height: 952440 }], branches: [] },
+    })
+
+    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/btc.ots'
+    writeFileSync(proofPath, Buffer.from([1, 2, 3]))
+    insertStamp(db, { id: 'btc-id', hash: 'a'.repeat(64), proof_path: proofPath })
+
+    const result = await upgradeTimestamp({ id: 'btc-id' }, db, MOCK_CONFIG)
+
+    expect(result).toMatchObject({ id: 'btc-id', status: 'confirmed', bitcoin_block: 952440 })
+    const record = getStamp(db, 'btc-id')
+    expect(record?.status).toBe('confirmed')
+    expect(record?.bitcoin_block).toBe(952440)
   })
 })

@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs'
 import { OpenTimestampsClient, UpgradeError } from '@otskit/client'
-import { DetachedTimestampFile, StreamDeserializationContext } from '@otskit/core'
+import { DetachedTimestampFile } from '@otskit/core'
 import type { DatabaseLike } from '../db/driver.js'
 import type { Config } from '../types.js'
 import { getStamp, updateStampStatus } from '../db/stamps.js'
@@ -21,8 +21,7 @@ function collectAttestations(ts: any): any[] {
 
 function checkBitcoinConfirmation(bytes: Buffer): { confirmed: boolean; block?: number } {
   try {
-    const ctx = new StreamDeserializationContext(new Uint8Array(bytes))
-    const dtf = DetachedTimestampFile.deserialize(ctx)
+    const dtf = DetachedTimestampFile.deserialize(new Uint8Array(bytes))
     const attestations = collectAttestations(dtf.timestamp)
     const bitcoinAtts = attestations.filter((a: any) => a.kind === 'bitcoin')
     if (bitcoinAtts.length === 0) return { confirmed: false }
@@ -63,6 +62,16 @@ export async function upgradeTimestamp(
     upgraded = await client.upgrade(proofBefore)
   } catch (e) {
     if (e instanceof UpgradeError) {
+      const { confirmed, block } = checkBitcoinConfirmation(proofBefore)
+      if (confirmed && block !== undefined) {
+        const bitcoinTime = now
+        updateStampStatus(db, input.id, {
+          status: 'confirmed', bitcoin_block: block, bitcoin_time: bitcoinTime,
+          confirmed_at: now, last_attempt_at: now, attempt_count: newAttemptCount,
+        })
+        logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'success' })
+        return { id: input.id, status: 'confirmed', bitcoin_block: block, bitcoin_time: bitcoinTime, proof_path: record.proof_path }
+      }
       updateStampStatus(db, input.id, { last_attempt_at: now, attempt_count: newAttemptCount, next_retry_at: next })
       logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'pending' })
       return { id: input.id, status: 'pending', attempt_count: newAttemptCount, last_attempt_at: now, next_retry_at: next }
