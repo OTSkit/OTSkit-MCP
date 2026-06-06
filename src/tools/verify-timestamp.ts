@@ -2,7 +2,7 @@ import { readFileSync } from 'fs'
 import { OpenTimestampsClient } from '@otskit/client'
 import type { DatabaseLike } from '../db/driver.js'
 import type { Config } from '../types.js'
-import { getStamp } from '../db/stamps.js'
+import { getStamp, updateStampStatus } from '../db/stamps.js'
 import { logOperation } from '../db/operations-log.js'
 
 type VerifyTimestampResult =
@@ -55,11 +55,19 @@ export async function verifyTimestamp(
     return { status: 'unknown', hash: record.hash }
   }
 
+  const bitcoinTime = new Date(result.timestamp! * 1000).toISOString()
+  const now = new Date().toISOString()
+  updateStampStatus(db, input.id, {
+    status: 'confirmed',
+    bitcoin_block: result.blockHeight!,
+    bitcoin_time: bitcoinTime,
+    confirmed_at: now,
+  })
   logOperation(db, { stamp_id: input.id, action: 'verify', result: 'success' })
   return {
     status: 'confirmed',
     hash: record.hash,
     bitcoin_block: result.blockHeight!,
-    bitcoin_time: new Date(result.timestamp! * 1000).toISOString(),
+    bitcoin_time: bitcoinTime,
   }
 }

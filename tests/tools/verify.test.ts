@@ -3,13 +3,15 @@ import { makeRawDb } from '../helpers/db.js'
 import type { DatabaseLike } from '../../src/db/driver.js'
 import { writeFileSync, mkdirSync } from 'fs'
 import { initDb } from '../../src/db/schema.js'
-import { insertStamp } from '../../src/db/stamps.js'
+import { insertStamp, getStamp } from '../../src/db/stamps.js'
 import { verifyTimestamp } from '../../src/tools/verify-timestamp.js'
 import type { Config } from '../../src/types.js'
 
+const mockVerify = vi.fn().mockResolvedValue({ valid: false, error: 'No Bitcoin attestation found' })
+
 vi.mock('@otskit/client', () => ({
   OpenTimestampsClient: vi.fn().mockImplementation(() => ({
-    verify: vi.fn().mockResolvedValue({ valid: false, error: 'No Bitcoin attestation found' }),
+    verify: mockVerify,
   })),
 }))
 
@@ -45,5 +47,20 @@ describe('verify', () => {
     const result = await verifyTimestamp({ id: 'v-id' }, db, MOCK_CONFIG)
     expect(result).toHaveProperty('status', 'pending')
     expect(result).toHaveProperty('hash', 'a'.repeat(64))
+  })
+
+  it('updates DB to confirmed when bitcoin verification succeeds', async () => {
+    mockVerify.mockResolvedValueOnce({ valid: true, blockHeight: 952440, timestamp: 1748476800 })
+
+    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/c.ots'
+    writeFileSync(proofPath, Buffer.from([1, 2, 3]))
+    insertStamp(db, { id: 'c-id', hash: 'a'.repeat(64), proof_path: proofPath })
+
+    const result = await verifyTimestamp({ id: 'c-id' }, db, MOCK_CONFIG)
+
+    expect(result).toMatchObject({ status: 'confirmed', bitcoin_block: 952440 })
+    const record = getStamp(db, 'c-id')
+    expect(record?.status).toBe('confirmed')
+    expect(record?.bitcoin_block).toBe(952440)
   })
 })
