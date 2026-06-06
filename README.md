@@ -7,9 +7,9 @@
 [![CI](https://github.com/OTSkit/OTSkit-MCP/actions/workflows/ci.yml/badge.svg)](https://github.com/OTSkit/OTSkit-MCP/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@otskit/mcp.svg)](https://www.npmjs.com/package/@otskit/mcp)
 [![npm downloads](https://img.shields.io/npm/dt/@otskit/mcp.svg)](https://www.npmjs.com/package/@otskit/mcp)
-[![TypeScript](https://img.shields.io/badge/TypeScript-6-blue.svg)](https://www.typescriptlang.org/)
-[![Node >=20](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/npm/dependency-version/@otskit/mcp/dev/typescript?label=TypeScript)](https://www.typescriptlang.org/)
+[![Node](https://img.shields.io/node/v/@otskit/mcp)](https://nodejs.org)
+[![License](https://img.shields.io/npm/l/@otskit/mcp)](LICENSE)
 [![Glama](https://glama.ai/mcp/servers/OTSkit/OTSkit-MCP/badges/score.svg)](https://glama.ai/mcp/servers/OTSkit/OTSkit-MCP)
 [![smithery badge](https://smithery.ai/badge/otskit/otskit-mcp)](https://smithery.ai/servers/otskit/otskit-mcp)
 
