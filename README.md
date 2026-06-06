@@ -11,7 +11,7 @@
 [![Node >=20](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Glama](https://glama.ai/mcp/servers/OTSkit/OTSkit-MCP/badges/score.svg)](https://glama.ai/mcp/servers/OTSkit/OTSkit-MCP)
-[![smithery badge](https://smithery.ai/badge/otskit/otskit-mcp)](https://smithery.ai/server/otskit/otskit-mcp)
+[![smithery badge](https://smithery.ai/badge/otskit/otskit-mcp)](https://smithery.ai/servers/otskit/otskit-mcp)
 
 OpenTimestamps MCP server - stamp, upgrade, and verify Bitcoin timestamps via AI agents.
 

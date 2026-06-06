@@ -4,3 +4,18 @@ dist/
 *.sqlite-wal
 *.sqlite-shm
 .env
+
+# Dev tooling — private, not for consumers
+CLAUDE.md
+GEMINI.md
+AGENTS.md
+
+# Smithery bundle artifacts
+*.mcpb
+manifest.json
+config-schema.json
+server-card.json
+
+# Build artifacts / binaries
+mcp-publisher.exe
+mcp-publisher.tar.gz
