@@ -1,3 +1,10 @@
+## [0.7.1](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.0...v0.7.1) (2026-06-06)
+
+
+### Bug Fixes
+
+* upgrade detects bitcoin attestation from existing .ots when calendar fails ([d9c2f5a](https://github.com/OTSkit/OTSkit-MCP/commit/d9c2f5adb29644c27f4255f8267edbfa3090d22c))
+
 # [0.7.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.6.4...v0.7.0) (2026-06-06)
 
 
