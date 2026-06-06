@@ -1,16 +1,12 @@
-name: OTSkit — Bitcoin Timestamps
-description: Stamp, upgrade, and verify Bitcoin timestamps via AI agents. Uses OpenTimestamps protocol against public calendars. No API keys required.
-license: MIT
-categories:
-  - blockchain
-  - bitcoin
-  - timestamps
-  - cryptography
-
 startCommand:
   type: stdio
-  command: npx
-  args:
-    - "-y"
-    - "@otskit/mcp"
-    - "serve"
+  configSchema:
+    type: object
+    properties: {}
+    description: No configuration required. No API keys needed.
+  commandFunction: |-
+    (config) => ({
+      command: "npx",
+      args: ["-y", "@otskit/mcp", "serve"],
+      env: {}
+    })
