@@ -1,3 +1,10 @@
+## [0.7.2](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.1...v0.7.2) (2026-06-06)
+
+
+### Bug Fixes
+
+* verify_timestamp updates DB to confirmed when Bitcoin verification succeeds ([6d0199c](https://github.com/OTSkit/OTSkit-MCP/commit/6d0199cbc8b1d638f5f444134372575bd95e7759))
+
 ## [0.7.1](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.0...v0.7.1) (2026-06-06)
 
 
