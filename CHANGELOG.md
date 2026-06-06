@@ -1,3 +1,10 @@
+# [0.7.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.6.4...v0.7.0) (2026-06-06)
+
+
+### Features
+
+* watch now upgrades due pending stamps automatically ([ebb4666](https://github.com/OTSkit/OTSkit-MCP/commit/ebb46662857707aba621ab32204b0cc897117fec))
+
 ## [0.6.4](https://github.com/OTSkit/OTSkit-MCP/compare/v0.6.3...v0.6.4) (2026-06-05)
 
 
