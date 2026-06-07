@@ -22,6 +22,18 @@ export function writeAtomic(dest: string, data: Uint8Array | Buffer): void {
   renameSync(tmp, dest)
 }
 
+// Escapes the five XML metacharacters for safe interpolation into XML text or
+// attribute values. The ampersand replacement must run first to avoid
+// double-escaping the entities produced by the others.
+export function escapeXml(raw: string): string {
+  return raw
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
+
 export type PathError = 'invalid_path' | 'path_not_allowed' | 'not_a_regular_file'
 
 // Canonicalizes a user-supplied path (resolving symlinks / `..`), enforces an
