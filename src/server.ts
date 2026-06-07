@@ -12,6 +12,7 @@ import { openWatchWindow } from './tools/watch-window.js'
 import { stampFile } from './tools/stamp-file.js'
 import { hashFileTool } from './tools/hash-file.js'
 import { TOOL_DEFINITIONS } from './tool-definitions.js'
+import { HashInput, IdInput, PathInput, ListInput, WatchInput, parse } from './schemas.js'
 
 export async function runServer(): Promise<void> {
   let config: ReturnType<typeof loadConfig> | null = null
@@ -33,21 +34,23 @@ export async function runServer(): Promise<void> {
     try {
       let result: unknown
       switch (name) {
-        case 'create_timestamp':  result = await createTimestamp(args as any, db, config); break
-        case 'upgrade_timestamp': result = await upgradeTimestamp(args as any, db, config); break
-        case 'verify_timestamp':  result = await verifyTimestamp(args as any, db, config); break
-        case 'inspect_timestamp': result = inspectTimestamp(args as any, db, config); break
-        case 'list_pending':      result = listPending(args as any, db, config); break
-        case 'hash_file':         result = await hashFileTool(args as any, config); break
-        case 'stamp_file':        result = await stampFile(args as any, db, config); break
-        case 'watch':             result = openWatchWindow((args as any)?.interval_minutes); break
+        case 'create_timestamp':  result = await createTimestamp(parse(HashInput, args), db, config); break
+        case 'upgrade_timestamp': result = await upgradeTimestamp(parse(IdInput, args), db, config); break
+        case 'verify_timestamp':  result = await verifyTimestamp(parse(IdInput, args), db, config); break
+        case 'inspect_timestamp': result = inspectTimestamp(parse(IdInput, args), db, config); break
+        case 'list_pending':      result = listPending(parse(ListInput, args), db, config); break
+        case 'hash_file':         result = await hashFileTool(parse(PathInput, args), config); break
+        case 'stamp_file':        result = await stampFile(parse(PathInput, args), db, config); break
+        case 'watch':             result = openWatchWindow(parse(WatchInput, args).interval_minutes); break
         default:
           return { content: [{ type: 'text', text: JSON.stringify({ error: 'unknown_tool', tool: name }) }], isError: true }
       }
       const isError = Boolean(result && typeof result === 'object' && 'error' in result)
       return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }], isError }
     } catch (e) {
-      return { content: [{ type: 'text', text: JSON.stringify({ error: 'internal_error', details: String(e) }) }], isError: true }
+      const details = String(e)
+      const code = details.includes('invalid_params') ? 'invalid_params' : 'internal_error'
+      return { content: [{ type: 'text', text: JSON.stringify({ error: code, details }) }], isError: true }
     }
   })
 
