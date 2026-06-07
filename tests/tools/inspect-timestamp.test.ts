@@ -53,4 +53,15 @@ describe('inspect_timestamp', () => {
     expect(result).toHaveProperty('bitcoin_attestations', 0)
     expect(result).toHaveProperty('bitcoin_confirmed', false)
   })
+
+  it('does not leak the absolute proof_path; exposes proof_exists instead', () => {
+    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/leak.ots'
+    writeFileSync(proofPath, Buffer.from([1, 2, 3]))
+    insertStamp(db, { id: 'i-3', hash: 'a'.repeat(64), proof_path: proofPath })
+
+    const result = inspectTimestamp({ id: 'i-3' }, db, MOCK_CONFIG)
+
+    expect(result).not.toHaveProperty('proof_path')
+    expect(result).toHaveProperty('proof_exists', true)
+  })
 })

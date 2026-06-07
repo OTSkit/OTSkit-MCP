@@ -13,7 +13,7 @@ const HEX64 = /^[0-9a-f]{64}$/i
 
 type CreateTimestampSuccess = {
   id: string; hash: string; status: 'pending'
-  calendars: string[]; created_at: string; proof_path: string
+  calendars: string[]; created_at: string
 }
 type CreateTimestampError = {
   error: 'invalid_hash' | 'calendar_error' | 'storage_error'
@@ -68,6 +68,5 @@ export async function createTimestamp(
     status: 'pending',
     calendars: config.calendars,
     created_at: record.created_at,
-    proof_path: proofPath,
   }
 }

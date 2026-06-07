@@ -7,7 +7,7 @@ import { getStamp, updateStampStatus } from '../db/stamps.js'
 import { logOperation } from '../db/operations-log.js'
 import { writeAtomic } from '../utils.js'
 
-type UpgradeTimestampConfirmed = { id: string; status: 'confirmed'; bitcoin_block: number; bitcoin_time: string; proof_path: string }
+type UpgradeTimestampConfirmed = { id: string; status: 'confirmed'; bitcoin_block: number; bitcoin_time: string }
 type UpgradeTimestampPending   = { id: string; status: 'pending'; attempt_count: number; last_attempt_at: string; next_retry_at: string }
 type UpgradeTimestampErr       = { error: 'not_found' | 'calendar_error' | 'storage_error'; details: string }
 
@@ -77,7 +77,7 @@ export async function upgradeTimestamp(
             confirmed_at: now, last_attempt_at: now, attempt_count: newAttemptCount,
           })
           logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'success' })
-          return { id: input.id, status: 'confirmed', bitcoin_block: v.blockHeight, bitcoin_time: bitcoinTime, proof_path: record.proof_path }
+          return { id: input.id, status: 'confirmed', bitcoin_block: v.blockHeight, bitcoin_time: bitcoinTime }
         }
       } catch { /* network error — fall through to pending */ }
       updateStampStatus(db, input.id, { last_attempt_at: now, attempt_count: newAttemptCount, next_retry_at: next })
@@ -99,7 +99,7 @@ export async function upgradeTimestamp(
       confirmed_at: now, last_attempt_at: now, attempt_count: newAttemptCount,
     })
     logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'success' })
-    return { id: input.id, status: 'confirmed', bitcoin_block: block, bitcoin_time: bitcoinTime, proof_path: record.proof_path }
+    return { id: input.id, status: 'confirmed', bitcoin_block: block, bitcoin_time: bitcoinTime }
   }
 
   updateStampStatus(db, input.id, { last_attempt_at: now, attempt_count: newAttemptCount, next_retry_at: next })

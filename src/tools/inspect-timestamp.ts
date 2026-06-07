@@ -10,7 +10,7 @@ type InspectOk  = {
   hash: string
   status: string
   created_at: string
-  proof_path: string
+  proof_exists: boolean
   proof_size_bytes: number
   calendar_attestations: number
   bitcoin_attestations: number
@@ -57,7 +57,7 @@ export function inspectTimestamp(
     hash: record.hash,
     status: record.status,
     created_at: record.created_at,
-    proof_path: record.proof_path,
+    proof_exists: true,
     proof_size_bytes: proofSize,
     calendar_attestations: calendarAttestations,
     bitcoin_attestations: bitcoinAttestations,
