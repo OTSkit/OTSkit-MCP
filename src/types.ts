@@ -1,4 +1,4 @@
-export type StampStatus = 'pending' | 'confirmed' | 'failed' | 'timeout'
+export type StampStatus = 'pending' | 'confirmed' | 'failed' | 'timeout' | 'missing_proof'
 export type OperationAction = 'stamp' | 'upgrade' | 'verify' | 'preserve'
 export type OperationResult = 'success' | 'pending' | 'failed'
 
