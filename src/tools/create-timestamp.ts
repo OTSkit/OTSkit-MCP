@@ -1,9 +1,9 @@
-import { mkdirSync } from 'fs'
+import { mkdirSync, unlinkSync } from 'fs'
 import { join } from 'path'
 import { randomUUID } from 'crypto'
 import { OpenTimestampsClient } from '@otskit/client'
 import type { DatabaseLike } from '../db/driver.js'
-import type { Config } from '../types.js'
+import type { Config, StampRecord } from '../types.js'
 import { getDataDir } from '../config.js'
 import { insertStamp } from '../db/stamps.js'
 import { logOperation } from '../db/operations-log.js'
@@ -59,8 +59,19 @@ export async function createTimestamp(
     return { error: 'storage_error', details: String(e) }
   }
 
-  const record = insertStamp(db, { id, hash: normalizedHash, proof_path: proofPath })
-  logOperation(db, { stamp_id: id, action: 'stamp', result: 'success', response_time_ms: responseTimeMs })
+  // Atomic: the stamp record and its audit log entry must both land or neither.
+  // The proof file is written above (outside the transaction); roll it back on failure.
+  let record: StampRecord
+  db.exec('BEGIN')
+  try {
+    record = insertStamp(db, { id, hash: normalizedHash, proof_path: proofPath })
+    logOperation(db, { stamp_id: id, action: 'stamp', result: 'success', response_time_ms: responseTimeMs })
+    db.exec('COMMIT')
+  } catch (e) {
+    db.exec('ROLLBACK')
+    try { unlinkSync(proofPath) } catch {}
+    return { error: 'storage_error', details: String(e) }
+  }
 
   return {
     id: record.id,

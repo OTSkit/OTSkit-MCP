@@ -51,4 +51,15 @@ describe('stamp', () => {
       expect(result.id).toBeTruthy()
     }
   })
+
+  it('writes the stamp and its operation log atomically', async () => {
+    const result = await createTimestamp({ hash: 'b'.repeat(64) }, db, MOCK_CONFIG)
+    expect('error' in result).toBe(false)
+    if (!('error' in result)) {
+      const logs = db.all('SELECT * FROM operations_log WHERE stamp_id = ?', [result.id])
+      const stamps = db.all('SELECT * FROM stamps WHERE id = ?', [result.id])
+      expect(stamps).toHaveLength(1)
+      expect(logs).toHaveLength(1)
+    }
+  })
 })
