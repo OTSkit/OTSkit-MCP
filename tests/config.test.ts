@@ -1,7 +1,17 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { writeFileSync, mkdirSync } from 'fs'
+import { join } from 'path'
+import { tmpdir } from 'os'
 import { loadConfig, getDataDir } from '../src/config.js'
 
 const ORIG = process.env.OTS_MCP_DATA_DIR
+
+function writeConfig(obj: unknown): void {
+  const dir = join(tmpdir(), `ots-cfg-${Date.now()}-${Math.random().toString(36).slice(2)}`)
+  mkdirSync(dir, { recursive: true })
+  writeFileSync(join(dir, 'config.json'), JSON.stringify(obj))
+  process.env.OTS_MCP_DATA_DIR = dir
+}
 
 beforeEach(() => {
   process.env.OTS_MCP_DATA_DIR = `/tmp/ots-test-${Date.now()}`
@@ -23,5 +33,30 @@ describe('loadConfig', () => {
   it('getDataDir() respects OTS_MCP_DATA_DIR', () => {
     process.env.OTS_MCP_DATA_DIR = '/custom/path'
     expect(getDataDir()).toBe('/custom/path')
+  })
+
+  it('rejects a non-https calendar URL and falls back to defaults', () => {
+    writeConfig({ calendars: ['http://evil.internal/'] })
+    const cfg = loadConfig()
+    expect(cfg.calendars.every(u => u.startsWith('https://'))).toBe(true)
+    expect(cfg.calendars).not.toContain('http://evil.internal/')
+  })
+
+  it('rejects a calendar host not in the allowlist (SSRF)', () => {
+    writeConfig({ calendars: ['https://169.254.169.254/'] })
+    const cfg = loadConfig()
+    expect(cfg.calendars).not.toContain('https://169.254.169.254/')
+  })
+
+  it('rejects unknown config keys and falls back to defaults', () => {
+    writeConfig({ totally_unknown_key: 'x' })
+    const cfg = loadConfig()
+    expect(cfg.calendars).toHaveLength(4)
+  })
+
+  it('accepts a valid allowlisted calendar override', () => {
+    writeConfig({ calendars: ['https://alice.btc.calendar.opentimestamps.org'] })
+    const cfg = loadConfig()
+    expect(cfg.calendars).toEqual(['https://alice.btc.calendar.opentimestamps.org'])
   })
 })
