@@ -31,7 +31,11 @@ export async function verifyTimestamp(
 
   const client = new OpenTimestampsClient({
     calendars: config.calendars,
-    resilience: { timeout: config.calendar_timeout_ms },
+    resilience: {
+      totalTimeoutMs: config.calendar_timeout_ms,
+      connectTimeoutMs: Math.min(config.calendar_timeout_ms, 5000),
+      retries: { enabled: true, maxAttempts: config.retry_max_attempts, backoff: { strategy: 'exponential', initialDelayMs: 500, jitter: 'full' } },
+    },
   })
 
   let result: { valid: boolean; blockHeight?: number; timestamp?: number; error?: string }
