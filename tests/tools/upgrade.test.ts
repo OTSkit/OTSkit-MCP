@@ -7,10 +7,11 @@ import { insertStamp, getStamp } from '../../src/db/stamps.js'
 import { upgradeTimestamp } from '../../src/tools/upgrade-timestamp.js'
 import type { Config } from '../../src/types.js'
 
-const { mockUpgrade, MockUpgradeError, mockDeserialize } = vi.hoisted(() => {
+const { mockUpgrade, mockVerify, MockUpgradeError, mockDeserialize } = vi.hoisted(() => {
   class MockUpgradeError extends Error {}
   return {
     mockUpgrade: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
+    mockVerify: vi.fn().mockResolvedValue({ valid: false, error: 'No Bitcoin attestation' }),
     MockUpgradeError,
     mockDeserialize: vi.fn().mockReturnValue({ timestamp: { attestations: [], branches: [] } }),
   }
@@ -19,6 +20,7 @@ const { mockUpgrade, MockUpgradeError, mockDeserialize } = vi.hoisted(() => {
 vi.mock('@otskit/client', () => ({
   OpenTimestampsClient: vi.fn().mockImplementation(() => ({
     upgrade: mockUpgrade,
+    verify: mockVerify,
   })),
   UpgradeError: MockUpgradeError,
 }))
@@ -65,11 +67,27 @@ describe('upgrade', () => {
     }
   })
 
-  it('returns confirmed and updates DB when calendar fails but .ots already has bitcoin attestation', async () => {
+  it('does NOT confirm from local attestation when upgrade throws UpgradeError and blockchain verify is not valid', async () => {
     mockUpgrade.mockRejectedValueOnce(new MockUpgradeError('calendar unavailable'))
+    // even if a local .ots claims a bitcoin attestation, blockchain verify is authoritative
     mockDeserialize.mockReturnValueOnce({
       timestamp: { attestations: [{ kind: 'bitcoin', height: 952440 }], branches: [] },
     })
+    mockVerify.mockResolvedValueOnce({ valid: false, error: 'No Bitcoin attestation' })
+
+    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/fake.ots'
+    writeFileSync(proofPath, Buffer.from([1, 2, 3]))
+    insertStamp(db, { id: 'fake-id', hash: 'a'.repeat(64), proof_path: proofPath })
+
+    const result = await upgradeTimestamp({ id: 'fake-id' }, db, MOCK_CONFIG)
+
+    expect(result).toMatchObject({ id: 'fake-id', status: 'pending' })
+    expect(getStamp(db, 'fake-id')?.status).toBe('pending')
+  })
+
+  it('confirms only when blockchain verify succeeds in the UpgradeError path', async () => {
+    mockUpgrade.mockRejectedValueOnce(new MockUpgradeError('calendar unavailable'))
+    mockVerify.mockResolvedValueOnce({ valid: true, blockHeight: 952440, timestamp: 1_700_000_000 })
 
     const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/btc.ots'
     writeFileSync(proofPath, Buffer.from([1, 2, 3]))

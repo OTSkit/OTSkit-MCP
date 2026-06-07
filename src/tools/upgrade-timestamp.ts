@@ -62,16 +62,20 @@ export async function upgradeTimestamp(
     upgraded = await client.upgrade(proofBefore)
   } catch (e) {
     if (e instanceof UpgradeError) {
-      const { confirmed, block } = checkBitcoinConfirmation(proofBefore)
-      if (confirmed && block !== undefined) {
-        const bitcoinTime = now
-        updateStampStatus(db, input.id, {
-          status: 'confirmed', bitcoin_block: block, bitcoin_time: bitcoinTime,
-          confirmed_at: now, last_attempt_at: now, attempt_count: newAttemptCount,
-        })
-        logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'success' })
-        return { id: input.id, status: 'confirmed', bitcoin_block: block, bitcoin_time: bitcoinTime, proof_path: record.proof_path }
-      }
+      // Do NOT trust the local .ots attestation — an attacker with write access to the
+      // proofs dir could forge a Bitcoin attestation. Verify against the blockchain instead.
+      try {
+        const v = await client.verify(proofBefore, record.hash)
+        if (v.valid && v.blockHeight != null && v.timestamp != null) {
+          const bitcoinTime = new Date(v.timestamp * 1000).toISOString()
+          updateStampStatus(db, input.id, {
+            status: 'confirmed', bitcoin_block: v.blockHeight, bitcoin_time: bitcoinTime,
+            confirmed_at: now, last_attempt_at: now, attempt_count: newAttemptCount,
+          })
+          logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'success' })
+          return { id: input.id, status: 'confirmed', bitcoin_block: v.blockHeight, bitcoin_time: bitcoinTime, proof_path: record.proof_path }
+        }
+      } catch { /* network error — fall through to pending */ }
       updateStampStatus(db, input.id, { last_attempt_at: now, attempt_count: newAttemptCount, next_retry_at: next })
       logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'pending' })
       return { id: input.id, status: 'pending', attempt_count: newAttemptCount, last_attempt_at: now, next_retry_at: next }
