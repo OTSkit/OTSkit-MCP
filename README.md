@@ -84,7 +84,6 @@ Create `~/.ots-mcp/config.json` to override defaults:
   "scheduler_interval_minutes": 30,
   "retry_max_attempts": 20,
   "calendar_timeout_ms": 10000,
-  "esplora_url": "https://blockstream.info/api",
   "calendars": [
     "https://alice.btc.calendar.opentimestamps.org",
     "https://bob.btc.calendar.opentimestamps.org",

@@ -15,7 +15,6 @@ const DEFAULTS: Config = {
   preserve_max_files: 10_000,
   scheduler_interval_minutes: 30,
   calendar_timeout_ms: 10_000,
-  calendar_max_response_bytes: 1_048_576,
   retry_max_attempts: 20,
   log_file: join(getDataDir(), 'ots-mcp.log'),
   calendars: [
@@ -24,7 +23,6 @@ const DEFAULTS: Config = {
     'https://finney.calendar.eternitywall.com',
     'https://btc.calendar.catallaxy.com',
   ],
-  esplora_url: 'https://blockstream.info/api',
 }
 
 export function loadConfig(): Config {

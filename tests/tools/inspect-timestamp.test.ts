@@ -11,8 +11,8 @@ const MOCK_CONFIG: Config = {
   stamp_enabled: true, preserve_enabled: true, preserve_whitelist: [],
   preserve_max_bytes: 104_857_600, preserve_max_files: 10_000,
   scheduler_interval_minutes: 30, calendar_timeout_ms: 10_000,
-  calendar_max_response_bytes: 1_048_576, retry_max_attempts: 20,
-  log_file: '/tmp/test.log', calendars: [], esplora_url: 'https://blockstream.info/api',
+  retry_max_attempts: 20,
+  log_file: '/tmp/test.log', calendars: [],
 }
 
 let db: DatabaseLike
