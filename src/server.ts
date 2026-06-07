@@ -13,6 +13,7 @@ import { stampFile } from './tools/stamp-file.js'
 import { hashFileTool } from './tools/hash-file.js'
 import { TOOL_DEFINITIONS } from './tool-definitions.js'
 import { HashInput, IdInput, PathInput, ListInput, WatchInput, parse } from './schemas.js'
+import { featureDisabledError } from './feature-gate.js'
 
 export async function runServer(): Promise<void> {
   let config: ReturnType<typeof loadConfig> | null = null
@@ -31,6 +32,8 @@ export async function runServer(): Promise<void> {
     const { name, arguments: args } = request.params
     const db = getDb()
     const config = getConfig()
+    const gate = featureDisabledError(name, config)
+    if (gate) return { content: [{ type: 'text', text: JSON.stringify(gate) }], isError: true }
     try {
       let result: unknown
       switch (name) {
