@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+export {} // top-level await requires this file to be a module
 const [, , command, ...args] = process.argv
 
 if (!command || command === '--help' || command === 'help') {
