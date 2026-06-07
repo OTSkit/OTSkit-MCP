@@ -29,7 +29,7 @@ export function backupDb(destPath: string): void {
   getDb().exec(`VACUUM INTO '${escaped}'`)
 }
 
-function reconcileOrphans(db: DatabaseLike): void {
+export function reconcileOrphans(db: DatabaseLike): void {
   const pending = db.all(
     `SELECT id, proof_path FROM stamps WHERE status = 'pending' AND proof_path IS NOT NULL`
   ) as { id: string; proof_path: string }[]
@@ -38,8 +38,10 @@ function reconcileOrphans(db: DatabaseLike): void {
     try {
       statSync(row.proof_path)
     } catch {
-      db.run(`UPDATE stamps SET status = 'failed', last_error = ? WHERE id = ?`,
-        ['proof file missing on disk', row.id])
+      // Recoverable (e.g. unmounted volume, crash mid-write): use missing_proof,
+      // not the terminal 'failed', so the proof can be re-fetched later.
+      db.run(`UPDATE stamps SET status = 'missing_proof', last_error = ? WHERE id = ?`,
+        ['proof file not found at startup', row.id])
     }
   }
 }

@@ -2,9 +2,11 @@ import type { DatabaseLike } from '../db/driver.js'
 import type { Config, StampRecord, StampStatus } from '../types.js'
 import { listStamps } from '../db/stamps.js'
 
-type PublicStampRecord = Omit<StampRecord, 'attempt_count' | 'last_attempt_at' | 'next_retry_at'>
+type PublicStampRecord = Omit<StampRecord, 'attempt_count' | 'last_attempt_at' | 'next_retry_at' | 'proof_path' | 'archive_path'>
 
-function toPublic({ attempt_count: _, last_attempt_at: __, next_retry_at: ___, ...rest }: StampRecord): PublicStampRecord {
+function toPublic(
+  { attempt_count: _a, last_attempt_at: _b, next_retry_at: _c, proof_path: _d, archive_path: _e, ...rest }: StampRecord
+): PublicStampRecord {
   return rest
 }
 

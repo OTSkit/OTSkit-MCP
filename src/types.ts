@@ -1,4 +1,4 @@
-export type StampStatus = 'pending' | 'confirmed' | 'failed' | 'timeout'
+export type StampStatus = 'pending' | 'confirmed' | 'failed' | 'timeout' | 'missing_proof'
 export type OperationAction = 'stamp' | 'upgrade' | 'verify' | 'preserve'
 export type OperationResult = 'success' | 'pending' | 'failed'
 
@@ -27,9 +27,7 @@ export interface Config {
   preserve_max_files: number
   scheduler_interval_minutes: number
   calendar_timeout_ms: number
-  calendar_max_response_bytes: number
   retry_max_attempts: number
   log_file: string
   calendars: string[]
-  esplora_url: string
 }

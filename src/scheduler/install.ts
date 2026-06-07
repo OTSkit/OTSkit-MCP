@@ -1,10 +1,11 @@
 import { execFileSync } from 'child_process'
 import { writeFileSync } from 'fs'
-import { which } from '../utils.js'
+import { which, escapeXml } from '../utils.js'
 
 export async function installScheduler(args: string[]): Promise<void> {
   const intervalIdx = args.indexOf('--interval')
-  const interval = intervalIdx !== -1 ? parseInt(args[intervalIdx + 1] ?? '30') : 30
+  const parsedInterval = intervalIdx !== -1 ? parseInt(args[intervalIdx + 1] ?? '30') : 30
+  const interval = Math.max(1, Math.min(1440, Number.isFinite(parsedInterval) ? parsedInterval : 30))
   const bin = which('ots-mcp') ?? process.argv[1]
 
   if (process.platform === 'win32') {
@@ -16,7 +17,7 @@ export async function installScheduler(args: string[]): Promise<void> {
     <StartBoundary>2020-01-01T00:00:00</StartBoundary><Enabled>true</Enabled>
   </TimeTrigger></Triggers>
   <Actions><Exec>
-    <Command>${bin}</Command>
+    <Command>${escapeXml(bin)}</Command>
     <Arguments>check-pending</Arguments>
   </Exec></Actions>
 </Task>`)

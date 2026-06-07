@@ -11,8 +11,8 @@ const MOCK_CONFIG: Config = {
   stamp_enabled: true, preserve_enabled: true, preserve_whitelist: [],
   preserve_max_bytes: 104_857_600, preserve_max_files: 10_000,
   scheduler_interval_minutes: 30, calendar_timeout_ms: 10_000,
-  calendar_max_response_bytes: 1_048_576, retry_max_attempts: 20,
-  log_file: '/tmp/test.log', calendars: [], esplora_url: 'https://blockstream.info/api',
+  retry_max_attempts: 20,
+  log_file: '/tmp/test.log', calendars: [],
 }
 
 let db: DatabaseLike
@@ -52,5 +52,16 @@ describe('inspect_timestamp', () => {
     expect(result).toHaveProperty('calendar_attestations', 0)
     expect(result).toHaveProperty('bitcoin_attestations', 0)
     expect(result).toHaveProperty('bitcoin_confirmed', false)
+  })
+
+  it('does not leak the absolute proof_path; exposes proof_exists instead', () => {
+    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/leak.ots'
+    writeFileSync(proofPath, Buffer.from([1, 2, 3]))
+    insertStamp(db, { id: 'i-3', hash: 'a'.repeat(64), proof_path: proofPath })
+
+    const result = inspectTimestamp({ id: 'i-3' }, db, MOCK_CONFIG)
+
+    expect(result).not.toHaveProperty('proof_path')
+    expect(result).toHaveProperty('proof_exists', true)
   })
 })

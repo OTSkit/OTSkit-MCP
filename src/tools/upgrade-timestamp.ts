@@ -7,7 +7,7 @@ import { getStamp, updateStampStatus } from '../db/stamps.js'
 import { logOperation } from '../db/operations-log.js'
 import { writeAtomic } from '../utils.js'
 
-type UpgradeTimestampConfirmed = { id: string; status: 'confirmed'; bitcoin_block: number; bitcoin_time: string; proof_path: string }
+type UpgradeTimestampConfirmed = { id: string; status: 'confirmed'; bitcoin_block: number; bitcoin_time: string }
 type UpgradeTimestampPending   = { id: string; status: 'pending'; attempt_count: number; last_attempt_at: string; next_retry_at: string }
 type UpgradeTimestampErr       = { error: 'not_found' | 'calendar_error' | 'storage_error'; details: string }
 
@@ -50,7 +50,11 @@ export async function upgradeTimestamp(
   const proofBefore = readFileSync(record.proof_path)
   const client = new OpenTimestampsClient({
     calendars: config.calendars,
-    resilience: { timeout: config.calendar_timeout_ms },
+    resilience: {
+      totalTimeoutMs: config.calendar_timeout_ms,
+      connectTimeoutMs: Math.min(config.calendar_timeout_ms, 5000),
+      retries: { enabled: true, maxAttempts: config.retry_max_attempts, backoff: { strategy: 'exponential', initialDelayMs: 500, jitter: 'full' } },
+    },
   })
 
   const now = new Date().toISOString()
@@ -62,16 +66,20 @@ export async function upgradeTimestamp(
     upgraded = await client.upgrade(proofBefore)
   } catch (e) {
     if (e instanceof UpgradeError) {
-      const { confirmed, block } = checkBitcoinConfirmation(proofBefore)
-      if (confirmed && block !== undefined) {
-        const bitcoinTime = now
-        updateStampStatus(db, input.id, {
-          status: 'confirmed', bitcoin_block: block, bitcoin_time: bitcoinTime,
-          confirmed_at: now, last_attempt_at: now, attempt_count: newAttemptCount,
-        })
-        logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'success' })
-        return { id: input.id, status: 'confirmed', bitcoin_block: block, bitcoin_time: bitcoinTime, proof_path: record.proof_path }
-      }
+      // Do NOT trust the local .ots attestation — an attacker with write access to the
+      // proofs dir could forge a Bitcoin attestation. Verify against the blockchain instead.
+      try {
+        const v = await client.verify(proofBefore, record.hash)
+        if (v.valid && v.blockHeight != null && v.timestamp != null) {
+          const bitcoinTime = new Date(v.timestamp * 1000).toISOString()
+          updateStampStatus(db, input.id, {
+            status: 'confirmed', bitcoin_block: v.blockHeight, bitcoin_time: bitcoinTime,
+            confirmed_at: now, last_attempt_at: now, attempt_count: newAttemptCount,
+          })
+          logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'success' })
+          return { id: input.id, status: 'confirmed', bitcoin_block: v.blockHeight, bitcoin_time: bitcoinTime }
+        }
+      } catch { /* network error — fall through to pending */ }
       updateStampStatus(db, input.id, { last_attempt_at: now, attempt_count: newAttemptCount, next_retry_at: next })
       logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'pending' })
       return { id: input.id, status: 'pending', attempt_count: newAttemptCount, last_attempt_at: now, next_retry_at: next }
@@ -91,7 +99,7 @@ export async function upgradeTimestamp(
       confirmed_at: now, last_attempt_at: now, attempt_count: newAttemptCount,
     })
     logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'success' })
-    return { id: input.id, status: 'confirmed', bitcoin_block: block, bitcoin_time: bitcoinTime, proof_path: record.proof_path }
+    return { id: input.id, status: 'confirmed', bitcoin_block: block, bitcoin_time: bitcoinTime }
   }
 
   updateStampStatus(db, input.id, { last_attempt_at: now, attempt_count: newAttemptCount, next_retry_at: next })

@@ -19,8 +19,8 @@ const MOCK_CONFIG: Config = {
   stamp_enabled: true, preserve_enabled: true, preserve_whitelist: [],
   preserve_max_bytes: 104_857_600, preserve_max_files: 10_000,
   scheduler_interval_minutes: 30, calendar_timeout_ms: 10_000,
-  calendar_max_response_bytes: 1_048_576, retry_max_attempts: 20,
-  log_file: '/tmp/test.log', calendars: [], esplora_url: 'https://blockstream.info/api',
+  retry_max_attempts: 20,
+  log_file: '/tmp/test.log', calendars: [],
 }
 
 let db: DatabaseLike
@@ -62,5 +62,16 @@ describe('verify', () => {
     const record = getStamp(db, 'c-id')
     expect(record?.status).toBe('confirmed')
     expect(record?.bitcoin_block).toBe(952440)
+  })
+
+  it('returns unknown (no crash) when verify is valid but missing blockHeight/timestamp', async () => {
+    mockVerify.mockResolvedValueOnce({ valid: true })
+
+    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/g.ots'
+    writeFileSync(proofPath, Buffer.from([1, 2, 3]))
+    insertStamp(db, { id: 'g-id', hash: 'a'.repeat(64), proof_path: proofPath })
+
+    const result = await verifyTimestamp({ id: 'g-id' }, db, MOCK_CONFIG)
+    expect(result).toMatchObject({ status: 'unknown', hash: 'a'.repeat(64) })
   })
 })

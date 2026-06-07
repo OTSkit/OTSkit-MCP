@@ -31,7 +31,11 @@ export async function verifyTimestamp(
 
   const client = new OpenTimestampsClient({
     calendars: config.calendars,
-    resilience: { timeout: config.calendar_timeout_ms },
+    resilience: {
+      totalTimeoutMs: config.calendar_timeout_ms,
+      connectTimeoutMs: Math.min(config.calendar_timeout_ms, 5000),
+      retries: { enabled: true, maxAttempts: config.retry_max_attempts, backoff: { strategy: 'exponential', initialDelayMs: 500, jitter: 'full' } },
+    },
   })
 
   let result: { valid: boolean; blockHeight?: number; timestamp?: number; error?: string }
@@ -55,11 +59,18 @@ export async function verifyTimestamp(
     return { status: 'unknown', hash: record.hash }
   }
 
-  const bitcoinTime = new Date(result.timestamp! * 1000).toISOString()
+  if (result.blockHeight == null || result.timestamp == null) {
+    // Library contract violation: valid:true but no block/time. Don't crash or
+    // assert — treat as unknown.
+    logOperation(db, { stamp_id: input.id, action: 'verify', result: 'failed', error_msg: 'valid:true without blockHeight/timestamp' })
+    return { status: 'unknown', hash: record.hash }
+  }
+
+  const bitcoinTime = new Date(result.timestamp * 1000).toISOString()
   const now = new Date().toISOString()
   updateStampStatus(db, input.id, {
     status: 'confirmed',
-    bitcoin_block: result.blockHeight!,
+    bitcoin_block: result.blockHeight,
     bitcoin_time: bitcoinTime,
     confirmed_at: now,
   })
@@ -67,7 +78,7 @@ export async function verifyTimestamp(
   return {
     status: 'confirmed',
     hash: record.hash,
-    bitcoin_block: result.blockHeight!,
+    bitcoin_block: result.blockHeight,
     bitcoin_time: bitcoinTime,
   }
 }

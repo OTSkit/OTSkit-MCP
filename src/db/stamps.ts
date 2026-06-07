@@ -36,9 +36,9 @@ export function getStamp(db: DatabaseLike, id: string): StampRecord | null {
 
 export function updateStampStatus(db: DatabaseLike, id: string, params: UpdateParams): void {
   const fields: string[] = []
-  const values: unknown[] = []
+  const values: SQLiteValue[] = []
 
-  const add = (col: string, val: unknown) => { fields.push(`${col} = ?`); values.push(val) }
+  const add = (col: string, val: SQLiteValue) => { fields.push(`${col} = ?`); values.push(val) }
 
   if (params.status !== undefined)          add('status', params.status)
   if (params.bitcoin_block !== undefined)   add('bitcoin_block', params.bitcoin_block)
