@@ -1,3 +1,22 @@
+## [0.7.3](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.2...v0.7.3) (2026-06-07)
+
+
+### Bug Fixes
+
+* enforce stamp_enabled/preserve_enabled flags at the dispatcher ([0d6a2e2](https://github.com/OTSkit/OTSkit-MCP/commit/0d6a2e23cfc6298aafd38ec0cb27f919c35d93ca))
+* guard against valid:true verify result missing blockHeight/timestamp ([8abaaf9](https://github.com/OTSkit/OTSkit-MCP/commit/8abaaf9af816518b5292aa5b66854fc708fd9d36))
+* remove dead esplora_url and calendar_max_response_bytes config ([10dff16](https://github.com/OTSkit/OTSkit-MCP/commit/10dff168a9135558fe46ced24b0ab34f03a8d235))
+* stop exposing absolute proof_path in tool responses (least privilege) ([9db406a](https://github.com/OTSkit/OTSkit-MCP/commit/9db406aede1f323f79a3022d64431e2d7d4d7baa))
+* strict config validation with HTTPS calendar host allowlist (SSRF) ([fa6602a](https://github.com/OTSkit/OTSkit-MCP/commit/fa6602a18d1599ff17d8bf66dd374dfaeb41f4fb))
+* type errors hidden by esbuild build (tsconfig types, module, SQLiteValue) ([a8b2ca0](https://github.com/OTSkit/OTSkit-MCP/commit/a8b2ca066f01315017a88e5043f5c13b60c0be55))
+* use recoverable missing_proof status instead of permanent failed ([18e1fd2](https://github.com/OTSkit/OTSkit-MCP/commit/18e1fd25d5f09c74d65edf3489d6a7211858051a))
+* validate all tool inputs with Zod at the MCP boundary ([b3f475d](https://github.com/OTSkit/OTSkit-MCP/commit/b3f475d92d3db67cf05b975dc14c66408b262964))
+* validate file paths and stream-hash in hash_file/stamp_file ([af7fd8e](https://github.com/OTSkit/OTSkit-MCP/commit/af7fd8e095a3dce8c845e45c9ad3a956d3a3a259))
+* verify against blockchain instead of trusting local attestation on UpgradeError ([b2c14ba](https://github.com/OTSkit/OTSkit-MCP/commit/b2c14ba132281d05fe032af2c19d95303ce01480))
+* wire calendar_timeout_ms and retry_max_attempts into client resilience ([3ff4fbb](https://github.com/OTSkit/OTSkit-MCP/commit/3ff4fbb532f7117737a657438e533c92a3f532d0))
+* wrap insertStamp + logOperation in a single transaction ([6942f03](https://github.com/OTSkit/OTSkit-MCP/commit/6942f031a11ae6b6eed3f2e494a4b69039ce096c))
+* XML-escape binary path and bound interval in scheduler install (CWE-91) ([d4f9b95](https://github.com/OTSkit/OTSkit-MCP/commit/d4f9b9575cc4391871d36864c9f9be361e1bdc95))
+
 ## [0.7.2](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.1...v0.7.2) (2026-06-06)
 
 
