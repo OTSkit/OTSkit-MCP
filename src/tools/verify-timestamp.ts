@@ -59,11 +59,18 @@ export async function verifyTimestamp(
     return { status: 'unknown', hash: record.hash }
   }
 
-  const bitcoinTime = new Date(result.timestamp! * 1000).toISOString()
+  if (result.blockHeight == null || result.timestamp == null) {
+    // Library contract violation: valid:true but no block/time. Don't crash or
+    // assert — treat as unknown.
+    logOperation(db, { stamp_id: input.id, action: 'verify', result: 'failed', error_msg: 'valid:true without blockHeight/timestamp' })
+    return { status: 'unknown', hash: record.hash }
+  }
+
+  const bitcoinTime = new Date(result.timestamp * 1000).toISOString()
   const now = new Date().toISOString()
   updateStampStatus(db, input.id, {
     status: 'confirmed',
-    bitcoin_block: result.blockHeight!,
+    bitcoin_block: result.blockHeight,
     bitcoin_time: bitcoinTime,
     confirmed_at: now,
   })
@@ -71,7 +78,7 @@ export async function verifyTimestamp(
   return {
     status: 'confirmed',
     hash: record.hash,
-    bitcoin_block: result.blockHeight!,
+    bitcoin_block: result.blockHeight,
     bitcoin_time: bitcoinTime,
   }
 }
