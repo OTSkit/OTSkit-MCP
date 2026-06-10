@@ -1,3 +1,10 @@
+## [0.7.4](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.3...v0.7.4) (2026-06-10)
+
+
+### Bug Fixes
+
+* align verify/upgrade tools with @otskit/client discriminated union ([905e4f7](https://github.com/OTSkit/OTSkit-MCP/commit/905e4f7461ed9f9c578692d5cb2e2eadc7d3a9da))
+
 ## [0.7.3](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.2...v0.7.3) (2026-06-07)
 
 
