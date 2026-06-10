@@ -31,8 +31,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@otskit/client": "^0.2.0",
-    "@otskit/core": "^0.1.0",
+    "@otskit/client": "^0.4.0",
+    "@otskit/core": "^0.2.0",
     "node-sqlite3-wasm": "0.8.57",
     "zod": "^4.4.3"
   },

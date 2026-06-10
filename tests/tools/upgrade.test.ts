@@ -11,7 +11,8 @@ const { mockUpgrade, mockVerify, MockUpgradeError, mockDeserialize } = vi.hoiste
   class MockUpgradeError extends Error {}
   return {
     mockUpgrade: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
-    mockVerify: vi.fn().mockResolvedValue({ valid: false, error: 'No Bitcoin attestation' }),
+    // VerificationResult union (discriminated on `status`), matching @otskit/client.
+    mockVerify: vi.fn().mockResolvedValue({ status: 'pending', reason: 'No Bitcoin attestation' }),
     MockUpgradeError,
     mockDeserialize: vi.fn().mockReturnValue({ timestamp: { attestations: [], branches: [] } }),
   }
@@ -73,7 +74,7 @@ describe('upgrade', () => {
     mockDeserialize.mockReturnValueOnce({
       timestamp: { attestations: [{ kind: 'bitcoin', height: 952440 }], branches: [] },
     })
-    mockVerify.mockResolvedValueOnce({ valid: false, error: 'No Bitcoin attestation' })
+    mockVerify.mockResolvedValueOnce({ status: 'pending', reason: 'No Bitcoin attestation' })
 
     const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/fake.ots'
     writeFileSync(proofPath, Buffer.from([1, 2, 3]))
@@ -87,7 +88,7 @@ describe('upgrade', () => {
 
   it('confirms only when blockchain verify succeeds in the UpgradeError path', async () => {
     mockUpgrade.mockRejectedValueOnce(new MockUpgradeError('calendar unavailable'))
-    mockVerify.mockResolvedValueOnce({ valid: true, blockHeight: 952440, timestamp: 1_700_000_000 })
+    mockVerify.mockResolvedValueOnce({ status: 'verified', blockHeight: 952440, blockTime: 1_700_000_000 })
 
     const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/btc.ots'
     writeFileSync(proofPath, Buffer.from([1, 2, 3]))

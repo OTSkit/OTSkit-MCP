@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs'
 import { OpenTimestampsClient } from '@otskit/client'
+import type { VerificationResult } from '@otskit/client'
 import type { DatabaseLike } from '../db/driver.js'
 import type { Config } from '../types.js'
 import { getStamp, updateStampStatus } from '../db/stamps.js'
@@ -38,7 +39,9 @@ export async function verifyTimestamp(
     },
   })
 
-  let result: { valid: boolean; blockHeight?: number; timestamp?: number; error?: string }
+  // @otskit/client returns a discriminated union (VerificationResult) keyed on
+  // `status`. Map each variant onto this tool's own result shape.
+  let result: VerificationResult
   try {
     result = await client.verify(proofBytes, record.hash)
   } catch (e) {
@@ -46,39 +49,42 @@ export async function verifyTimestamp(
     return { status: 'network_error', hash: record.hash, details: String(e) }
   }
 
-  if (!result.valid) {
-    if (result.error?.includes('No Bitcoin attestation')) {
+  switch (result.status) {
+    case 'pending':
       logOperation(db, { stamp_id: input.id, action: 'verify', result: 'pending' })
       return { status: 'pending', hash: record.hash, calendars: config.calendars }
-    }
-    if (result.error?.toLowerCase().includes('invalid') || result.error?.toLowerCase().includes('corrupt')) {
-      logOperation(db, { stamp_id: input.id, action: 'verify', result: 'failed', error_msg: result.error })
-      return { status: 'invalid', hash: record.hash, reason: result.error ?? 'unknown' }
-    }
-    logOperation(db, { stamp_id: input.id, action: 'verify', result: 'failed', error_msg: result.error })
-    return { status: 'unknown', hash: record.hash }
-  }
 
-  if (result.blockHeight == null || result.timestamp == null) {
-    // Library contract violation: valid:true but no block/time. Don't crash or
-    // assert — treat as unknown.
-    logOperation(db, { stamp_id: input.id, action: 'verify', result: 'failed', error_msg: 'valid:true without blockHeight/timestamp' })
-    return { status: 'unknown', hash: record.hash }
-  }
+    case 'invalid':
+      logOperation(db, { stamp_id: input.id, action: 'verify', result: 'failed', error_msg: result.reason })
+      return { status: 'invalid', hash: record.hash, reason: result.reason }
 
-  const bitcoinTime = new Date(result.timestamp * 1000).toISOString()
-  const now = new Date().toISOString()
-  updateStampStatus(db, input.id, {
-    status: 'confirmed',
-    bitcoin_block: result.blockHeight,
-    bitcoin_time: bitcoinTime,
-    confirmed_at: now,
-  })
-  logOperation(db, { stamp_id: input.id, action: 'verify', result: 'success' })
-  return {
-    status: 'confirmed',
-    hash: record.hash,
-    bitcoin_block: result.blockHeight,
-    bitcoin_time: bitcoinTime,
+    case 'network_error':
+      logOperation(db, { stamp_id: input.id, action: 'verify', result: 'failed', error_msg: result.reason })
+      return { status: 'network_error', hash: record.hash, details: result.reason }
+
+    case 'verified': {
+      const bitcoinTime = new Date(result.blockTime * 1000).toISOString()
+      const now = new Date().toISOString()
+      updateStampStatus(db, input.id, {
+        status: 'confirmed',
+        bitcoin_block: result.blockHeight,
+        bitcoin_time: bitcoinTime,
+        confirmed_at: now,
+      })
+      logOperation(db, { stamp_id: input.id, action: 'verify', result: 'success' })
+      return {
+        status: 'confirmed',
+        hash: record.hash,
+        bitcoin_block: result.blockHeight,
+        bitcoin_time: bitcoinTime,
+      }
+    }
+
+    /* c8 ignore next 4 */
+    default: {
+      // Exhaustiveness guard: a new VerificationResult variant must be handled here.
+      const _exhaustive: never = result
+      return { status: 'unknown', hash: record.hash }
+    }
   }
 }

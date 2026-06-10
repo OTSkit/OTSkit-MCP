@@ -2,14 +2,15 @@ import { readFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
 import { homedir } from 'os'
 import { z } from 'zod'
+import { DEFAULT_CALENDAR_URLS } from '@otskit/core'
 import type { Config } from './types.js'
 
-const TRUSTED_CALENDAR_HOSTS = new Set([
-  'alice.btc.calendar.opentimestamps.org',
-  'bob.btc.calendar.opentimestamps.org',
-  'finney.calendar.eternitywall.com',
-  'btc.calendar.catallaxy.com',
-])
+// Trusted calendar hosts derived from the canonical URL list in @otskit/core
+// (single source of truth). A user-supplied calendar is accepted only if its
+// hostname matches one of the default servers.
+const TRUSTED_CALENDAR_HOSTS = new Set(
+  DEFAULT_CALENDAR_URLS.map((u) => new URL(u).hostname),
+)
 
 const httpsAllowlisted = (hosts: Set<string>) =>
   z.string().refine(v => {
@@ -48,12 +49,7 @@ const DEFAULTS: Config = {
   calendar_timeout_ms: 10_000,
   retry_max_attempts: 20,
   log_file: join(getDataDir(), 'ots-mcp.log'),
-  calendars: [
-    'https://alice.btc.calendar.opentimestamps.org',
-    'https://bob.btc.calendar.opentimestamps.org',
-    'https://finney.calendar.eternitywall.com',
-    'https://btc.calendar.catallaxy.com',
-  ],
+  calendars: [...DEFAULT_CALENDAR_URLS],
 }
 
 export function loadConfig(): Config {

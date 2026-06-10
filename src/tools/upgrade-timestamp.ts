@@ -70,8 +70,8 @@ export async function upgradeTimestamp(
       // proofs dir could forge a Bitcoin attestation. Verify against the blockchain instead.
       try {
         const v = await client.verify(proofBefore, record.hash)
-        if (v.valid && v.blockHeight != null && v.timestamp != null) {
-          const bitcoinTime = new Date(v.timestamp * 1000).toISOString()
+        if (v.status === 'verified') {
+          const bitcoinTime = new Date(v.blockTime * 1000).toISOString()
           updateStampStatus(db, input.id, {
             status: 'confirmed', bitcoin_block: v.blockHeight, bitcoin_time: bitcoinTime,
             confirmed_at: now, last_attempt_at: now, attempt_count: newAttemptCount,

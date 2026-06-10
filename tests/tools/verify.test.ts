@@ -7,7 +7,8 @@ import { insertStamp, getStamp } from '../../src/db/stamps.js'
 import { verifyTimestamp } from '../../src/tools/verify-timestamp.js'
 import type { Config } from '../../src/types.js'
 
-const mockVerify = vi.fn().mockResolvedValue({ valid: false, error: 'No Bitcoin attestation found' })
+// Mocks use the real @otskit/client VerificationResult union (discriminated on `status`).
+const mockVerify = vi.fn().mockResolvedValue({ status: 'pending', reason: 'No Bitcoin attestation found — timestamp not yet confirmed' })
 
 vi.mock('@otskit/client', () => ({
   OpenTimestampsClient: vi.fn().mockImplementation(() => ({
@@ -50,7 +51,7 @@ describe('verify', () => {
   })
 
   it('updates DB to confirmed when bitcoin verification succeeds', async () => {
-    mockVerify.mockResolvedValueOnce({ valid: true, blockHeight: 952440, timestamp: 1748476800 })
+    mockVerify.mockResolvedValueOnce({ status: 'verified', blockHeight: 952440, blockTime: 1748476800 })
 
     const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/c.ots'
     writeFileSync(proofPath, Buffer.from([1, 2, 3]))
@@ -62,16 +63,42 @@ describe('verify', () => {
     const record = getStamp(db, 'c-id')
     expect(record?.status).toBe('confirmed')
     expect(record?.bitcoin_block).toBe(952440)
+    // blockTime (epoch s) must be rendered as an ISO string.
+    expect(record?.bitcoin_time).toBe(new Date(1748476800 * 1000).toISOString())
   })
 
-  it('returns unknown (no crash) when verify is valid but missing blockHeight/timestamp', async () => {
-    mockVerify.mockResolvedValueOnce({ valid: true })
+  it('returns invalid when the cryptographic verification fails', async () => {
+    mockVerify.mockResolvedValueOnce({ status: 'invalid', reason: 'File hash does not match proof' })
 
-    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/g.ots'
+    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/i.ots'
     writeFileSync(proofPath, Buffer.from([1, 2, 3]))
-    insertStamp(db, { id: 'g-id', hash: 'a'.repeat(64), proof_path: proofPath })
+    insertStamp(db, { id: 'i-id', hash: 'a'.repeat(64), proof_path: proofPath })
 
-    const result = await verifyTimestamp({ id: 'g-id' }, db, MOCK_CONFIG)
-    expect(result).toMatchObject({ status: 'unknown', hash: 'a'.repeat(64) })
+    const result = await verifyTimestamp({ id: 'i-id' }, db, MOCK_CONFIG)
+    expect(result).toMatchObject({ status: 'invalid', hash: 'a'.repeat(64), reason: 'File hash does not match proof' })
+    expect(getStamp(db, 'i-id')?.status).not.toBe('confirmed')
+  })
+
+  it('returns network_error when the explorer is unreachable', async () => {
+    mockVerify.mockResolvedValueOnce({ status: 'network_error', reason: 'Could not reach Bitcoin blockchain' })
+
+    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/n.ots'
+    writeFileSync(proofPath, Buffer.from([1, 2, 3]))
+    insertStamp(db, { id: 'n-id', hash: 'a'.repeat(64), proof_path: proofPath })
+
+    const result = await verifyTimestamp({ id: 'n-id' }, db, MOCK_CONFIG)
+    expect(result).toMatchObject({ status: 'network_error', hash: 'a'.repeat(64) })
+    expect(getStamp(db, 'n-id')?.status).not.toBe('confirmed')
+  })
+
+  it('returns network_error when verify throws', async () => {
+    mockVerify.mockRejectedValueOnce(new Error('socket hang up'))
+
+    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/t.ots'
+    writeFileSync(proofPath, Buffer.from([1, 2, 3]))
+    insertStamp(db, { id: 't-id', hash: 'a'.repeat(64), proof_path: proofPath })
+
+    const result = await verifyTimestamp({ id: 't-id' }, db, MOCK_CONFIG)
+    expect(result).toMatchObject({ status: 'network_error', hash: 'a'.repeat(64) })
   })
 })

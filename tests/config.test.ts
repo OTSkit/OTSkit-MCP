@@ -3,6 +3,7 @@ import { writeFileSync, mkdirSync } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
 import { loadConfig, getDataDir } from '../src/config.js'
+import { DEFAULT_CALENDAR_URLS } from '@otskit/core'
 
 const ORIG = process.env.OTS_MCP_DATA_DIR
 
@@ -58,5 +59,18 @@ describe('loadConfig', () => {
     writeConfig({ calendars: ['https://alice.btc.calendar.opentimestamps.org'] })
     const cfg = loadConfig()
     expect(cfg.calendars).toEqual(['https://alice.btc.calendar.opentimestamps.org'])
+  })
+
+  // B1 — the MCP default calendars and host allowlist derive from @otskit/core.
+  it('default calendars mirror the canonical core list', () => {
+    const cfg = loadConfig()
+    expect(cfg.calendars).toEqual([...DEFAULT_CALENDAR_URLS])
+  })
+
+  it('every canonical default calendar is itself accepted by the host allowlist', () => {
+    for (const url of DEFAULT_CALENDAR_URLS) {
+      writeConfig({ calendars: [url] })
+      expect(loadConfig().calendars).toEqual([url])
+    }
   })
 })
