@@ -10,6 +10,12 @@ vi.mock('@otskit/client', () => ({
   OpenTimestampsClient: vi.fn().mockImplementation(() => ({
     stamp: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
   })),
+  DEFAULT_CALENDARS: [
+    'https://alice.btc.calendar.opentimestamps.org',
+    'https://bob.btc.calendar.opentimestamps.org',
+    'https://finney.calendar.eternitywall.com',
+    'https://btc.calendar.catallaxy.com',
+  ],
 }))
 
 const MOCK_CONFIG: Config = {

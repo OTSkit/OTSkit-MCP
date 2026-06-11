@@ -2,14 +2,14 @@ import { readFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
 import { homedir } from 'os'
 import { z } from 'zod'
-import { DEFAULT_CALENDAR_URLS } from '@otskit/core'
+import { DEFAULT_CALENDARS } from '@otskit/client'
 import type { Config } from './types.js'
 
 // Trusted calendar hosts derived from the canonical URL list in @otskit/core
 // (single source of truth). A user-supplied calendar is accepted only if its
 // hostname matches one of the default servers.
 const TRUSTED_CALENDAR_HOSTS = new Set(
-  DEFAULT_CALENDAR_URLS.map((u) => new URL(u).hostname),
+  DEFAULT_CALENDARS.map((u) => new URL(u).hostname),
 )
 
 const httpsAllowlisted = (hosts: Set<string>) =>
@@ -49,7 +49,7 @@ const DEFAULTS: Config = {
   calendar_timeout_ms: 10_000,
   retry_max_attempts: 20,
   log_file: join(getDataDir(), 'ots-mcp.log'),
-  calendars: [...DEFAULT_CALENDAR_URLS],
+  calendars: [...DEFAULT_CALENDARS],
 }
 
 export function loadConfig(): Config {

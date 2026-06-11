@@ -25,6 +25,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: pnpm install
+      - run: pnpm typecheck
       - run: pnpm build
       - run: pnpm test
 
@@ -50,6 +51,7 @@ jobs:
         with:
           node-version: '22.x'
       - run: pnpm install
+      - run: pnpm typecheck
       - run: pnpm build
       - run: pnpm exec semantic-release
         env:

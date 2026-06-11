@@ -1,5 +1,5 @@
 import { readFileSync, statSync } from 'fs'
-import { DetachedTimestampFile } from '@otskit/core'
+import { DetachedTimestampFile } from '@otskit/client'
 import type { DatabaseLike } from '../db/driver.js'
 import type { Config } from '../types.js'
 import { getStamp } from '../db/stamps.js'
@@ -49,7 +49,7 @@ export function inspectTimestamp(
       bitcoinBlock = blocks.length > 0 ? Math.min(...blocks) : null
     }
   } catch {
-    // prueba parcial o inválida — devolvemos lo que sabemos
+    // partial or invalid proof — return what we know
   }
 
   return {
