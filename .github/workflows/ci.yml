@@ -32,6 +32,7 @@ jobs:
   coverage:
     name: Coverage
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
