@@ -1,3 +1,10 @@
+## [0.7.6](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.5...v0.7.6) (2026-06-11)
+
+
+### Bug Fixes
+
+* usar path.join en scheduler install para compatibilidad Linux/macOS ([c44f94a](https://github.com/OTSkit/OTSkit-MCP/commit/c44f94a92d88de3805dc5bfd171ee94ce9d5bb4c))
+
 ## [0.7.5](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.4...v0.7.5) (2026-06-11)
 
 
