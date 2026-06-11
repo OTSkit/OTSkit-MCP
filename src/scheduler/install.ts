@@ -1,5 +1,6 @@
 import { execFileSync } from 'child_process'
 import { writeFileSync } from 'fs'
+import { join } from 'path'
 import { which, escapeXml } from '../utils.js'
 
 export async function installScheduler(args: string[]): Promise<void> {
@@ -9,7 +10,7 @@ export async function installScheduler(args: string[]): Promise<void> {
   const bin = which('ots-mcp') ?? process.argv[1]
 
   if (process.platform === 'win32') {
-    const xmlPath = `${process.env.TEMP}\\ots-mcp-task.xml`
+    const xmlPath = join(process.env.TEMP ?? '', 'ots-mcp-task.xml')
     writeFileSync(xmlPath, `<?xml version="1.0"?>
 <Task xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
   <Triggers><TimeTrigger>
