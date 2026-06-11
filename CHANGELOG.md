@@ -1,3 +1,10 @@
+## [0.7.5](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.4...v0.7.5) (2026-06-11)
+
+
+### Bug Fixes
+
+* upgrade vitest to 3.2.6, remove direct @otskit/core dep ([9cf8eb6](https://github.com/OTSkit/OTSkit-MCP/commit/9cf8eb64c20472192064833ec4d8de6a585f5548))
+
 ## [0.7.4](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.3...v0.7.4) (2026-06-10)
 
 
