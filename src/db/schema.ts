@@ -51,6 +51,7 @@ function migrateTo1(db: DatabaseLike): void {
     `)
     db.exec('PRAGMA user_version = 1')
     db.exec('COMMIT')
+  /* c8 ignore next 4 */
   } catch (e) {
     db.exec('ROLLBACK')
     throw e

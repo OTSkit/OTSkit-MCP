@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { makeRawDb } from '../helpers/db.js'
 import type { DatabaseLike } from '../../src/db/driver.js'
 import { writeFileSync, mkdirSync } from 'fs'
@@ -6,6 +6,22 @@ import { initDb } from '../../src/db/schema.js'
 import { insertStamp } from '../../src/db/stamps.js'
 import { inspectTimestamp } from '../../src/tools/inspect-timestamp.js'
 import type { Config } from '../../src/types.js'
+
+// Default mock: deserialize returns an empty timestamp (no attestations).
+// Individual tests override with mockReturnValueOnce for bitcoin paths.
+vi.mock('@otskit/client', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@otskit/client')>()
+  return {
+    ...actual,
+    DetachedTimestampFile: {
+      deserialize: vi.fn().mockReturnValue({
+        timestamp: {
+          getAttestations: () => [],
+        },
+      }),
+    },
+  }
+})
 
 const MOCK_CONFIG: Config = {
   stamp_enabled: true, preserve_enabled: true, preserve_whitelist: [],
@@ -52,6 +68,31 @@ describe('inspect_timestamp', () => {
     expect(result).toHaveProperty('calendar_attestations', 0)
     expect(result).toHaveProperty('bitcoin_attestations', 0)
     expect(result).toHaveProperty('bitcoin_confirmed', false)
+  })
+
+  it('extracts bitcoin block height when attestation is present', async () => {
+    const { DetachedTimestampFile } = await import('@otskit/client')
+    vi.mocked(DetachedTimestampFile.deserialize).mockReturnValueOnce({
+      timestamp: {
+        getAttestations: () => [
+          { kind: 'bitcoin', height: 850000 },
+          { kind: 'bitcoin', height: 851000 },
+        ],
+      },
+    })
+
+    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/btc.ots'
+    writeFileSync(proofPath, Buffer.from([1, 2, 3]))
+    insertStamp(db, { id: 'btc-inspect', hash: 'a'.repeat(64), proof_path: proofPath })
+
+    const result = inspectTimestamp({ id: 'btc-inspect' }, db, MOCK_CONFIG)
+
+    expect(result).not.toHaveProperty('error')
+    if (!('error' in result)) {
+      expect(result.bitcoin_attestations).toBe(2)
+      expect(result.bitcoin_confirmed).toBe(true)
+      expect(result.bitcoin_block).toBe(850000) // Math.min(850000, 851000)
+    }
   })
 
   it('does not leak the absolute proof_path; exposes proof_exists instead', () => {

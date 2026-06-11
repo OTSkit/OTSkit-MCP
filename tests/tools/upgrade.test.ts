@@ -24,11 +24,7 @@ vi.mock('@otskit/client', () => ({
     verify: mockVerify,
   })),
   UpgradeError: MockUpgradeError,
-}))
-
-vi.mock('@otskit/core', () => ({
   DetachedTimestampFile: { deserialize: mockDeserialize },
-  StreamDeserializationContext: vi.fn().mockImplementation((bytes: Uint8Array) => bytes),
 }))
 
 const MOCK_CONFIG: Config = {
@@ -70,10 +66,7 @@ describe('upgrade', () => {
 
   it('does NOT confirm from local attestation when upgrade throws UpgradeError and blockchain verify is not valid', async () => {
     mockUpgrade.mockRejectedValueOnce(new MockUpgradeError('calendar unavailable'))
-    // even if a local .ots claims a bitcoin attestation, blockchain verify is authoritative
-    mockDeserialize.mockReturnValueOnce({
-      timestamp: { attestations: [{ kind: 'bitcoin', height: 952440 }], branches: [] },
-    })
+    // checkBitcoinConfirmation is NOT called in the UpgradeError path — blockchain verify is authoritative
     mockVerify.mockResolvedValueOnce({ status: 'pending', reason: 'No Bitcoin attestation' })
 
     const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/fake.ots'
@@ -84,6 +77,33 @@ describe('upgrade', () => {
 
     expect(result).toMatchObject({ id: 'fake-id', status: 'pending' })
     expect(getStamp(db, 'fake-id')?.status).toBe('pending')
+  })
+
+  it('returns calendar_error when upgrade throws a non-UpgradeError exception', async () => {
+    mockUpgrade.mockRejectedValueOnce(new Error('unexpected network failure'))
+
+    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/generic-err.ots'
+    writeFileSync(proofPath, Buffer.from([1, 2, 3]))
+    insertStamp(db, { id: 'err-id', hash: 'a'.repeat(64), proof_path: proofPath })
+
+    const result = await upgradeTimestamp({ id: 'err-id' }, db, MOCK_CONFIG)
+    expect(result).toMatchObject({ error: 'calendar_error', details: 'Error: unexpected network failure' })
+  })
+
+  it('returns confirmed when the upgraded proof contains a Bitcoin attestation', async () => {
+    // mockUpgrade returns a buffer (success); mock deserialize returns bitcoin attestation
+    mockUpgrade.mockResolvedValueOnce(Buffer.from([0xaa, 0xbb]))
+    mockDeserialize.mockReturnValueOnce({
+      timestamp: { attestations: [{ kind: 'bitcoin', height: 850000 }], branches: [] },
+    })
+
+    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/confirmed.ots'
+    writeFileSync(proofPath, Buffer.from([1, 2, 3]))
+    insertStamp(db, { id: 'conf-id', hash: 'a'.repeat(64), proof_path: proofPath })
+
+    const result = await upgradeTimestamp({ id: 'conf-id' }, db, MOCK_CONFIG)
+    expect(result).toMatchObject({ id: 'conf-id', status: 'confirmed', bitcoin_block: 850000 })
+    expect(getStamp(db, 'conf-id')?.status).toBe('confirmed')
   })
 
   it('confirms only when blockchain verify succeeds in the UpgradeError path', async () => {

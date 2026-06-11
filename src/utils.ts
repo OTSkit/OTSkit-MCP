@@ -58,6 +58,7 @@ export function validateFilePath(
   let st
   try {
     st = statSync(canonical)
+  /* c8 ignore next 2 — race condition: realpathSync succeeded but statSync failed immediately after */
   } catch (e: any) {
     return { error: 'invalid_path', details: String(e?.message ?? e) }
   }

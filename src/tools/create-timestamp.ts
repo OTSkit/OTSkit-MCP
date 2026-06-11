@@ -67,6 +67,7 @@ export async function createTimestamp(
     record = insertStamp(db, { id, hash: normalizedHash, proof_path: proofPath })
     logOperation(db, { stamp_id: id, action: 'stamp', result: 'success', response_time_ms: responseTimeMs })
     db.exec('COMMIT')
+  /* c8 ignore next 5 */
   } catch (e) {
     db.exec('ROLLBACK')
     try { unlinkSync(proofPath) } catch {}

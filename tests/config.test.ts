@@ -67,6 +67,22 @@ describe('loadConfig', () => {
     expect(cfg.calendars).toEqual([...DEFAULT_CALENDAR_URLS])
   })
 
+  it('falls back to defaults and writes to stderr when config file is invalid JSON', () => {
+    const dir = `/tmp/ots-cfg-bad-${Date.now()}`
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(dir, 'config.json'), '{ not valid json ]')
+    process.env.OTS_MCP_DATA_DIR = dir
+
+    const errs: string[] = []
+    const orig = process.stderr.write.bind(process.stderr)
+    process.stderr.write = (s: any) => { errs.push(String(s)); return true }
+    const cfg = loadConfig()
+    process.stderr.write = orig
+
+    expect(errs.join('')).toContain('config parse error')
+    expect(cfg.stamp_enabled).toBe(true)
+  })
+
   it('every canonical default calendar is itself accepted by the host allowlist', () => {
     for (const url of DEFAULT_CALENDAR_URLS) {
       writeConfig({ calendars: [url] })

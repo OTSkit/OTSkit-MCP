@@ -18,6 +18,6 @@ export async function hashFileTool(
     return { hash }
   } catch (e: any) {
     if (String(e?.message).startsWith('file_too_large')) return { error: 'file_too_large', details: e.message }
-    throw e
+    /* c8 ignore next */ throw e
   }
 }

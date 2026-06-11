@@ -18,6 +18,14 @@ vi.mock('@otskit/client', () => ({
   ],
 }))
 
+// Wrap writeAtomic so individual tests can override it via mockImplementationOnce.
+vi.mock('../../src/utils.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../src/utils.js')>()
+  return { ...actual, writeAtomic: vi.fn(actual.writeAtomic) }
+})
+
+import { writeAtomic } from '../../src/utils.js'
+
 const MOCK_CONFIG: Config = {
   stamp_enabled: true, preserve_enabled: true, preserve_whitelist: [],
   preserve_max_bytes: 104_857_600, preserve_max_files: 10_000,
@@ -35,7 +43,11 @@ beforeEach(() => {
   db = makeRawDb()
   initDb(db)
 })
-afterEach(() => { delete process.env.OTS_MCP_DATA_DIR })
+
+afterEach(() => {
+  delete process.env.OTS_MCP_DATA_DIR
+  vi.clearAllMocks()
+})
 
 describe('stamp', () => {
   it('returns invalid_hash for non-hex input', async () => {
@@ -67,5 +79,26 @@ describe('stamp', () => {
       expect(stamps).toHaveLength(1)
       expect(logs).toHaveLength(1)
     }
+  })
+
+  it('returns calendar_error when the OTS client stamp() rejects', async () => {
+    const { OpenTimestampsClient } = await import('@otskit/client')
+    vi.mocked(OpenTimestampsClient).mockImplementationOnce(() => ({
+      stamp: vi.fn().mockRejectedValue(new Error('calendar unreachable')),
+      verify: vi.fn(),
+    }))
+    const result = await createTimestamp({ hash: 'c'.repeat(64) }, db, MOCK_CONFIG)
+    expect(result).toMatchObject({ error: 'calendar_error' })
+    expect((result as any).details).toContain('calendar unreachable')
+  })
+
+  it('returns storage_error and rolls back when writeAtomic throws', async () => {
+    vi.mocked(writeAtomic).mockImplementationOnce(() => { throw new Error('disk full') })
+
+    const result = await createTimestamp({ hash: 'd'.repeat(64) }, db, MOCK_CONFIG)
+    expect(result).toMatchObject({ error: 'storage_error' })
+    // The DB transaction must be rolled back — no stamp should be inserted
+    const rows = db.all('SELECT * FROM stamps WHERE hash = ?', ['d'.repeat(64)])
+    expect(rows).toHaveLength(0)
   })
 })

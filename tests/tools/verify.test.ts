@@ -101,4 +101,19 @@ describe('verify', () => {
     const result = await verifyTimestamp({ id: 't-id' }, db, MOCK_CONFIG)
     expect(result).toMatchObject({ status: 'network_error', hash: 'a'.repeat(64) })
   })
+
+  it('returns storage_error when the stamp record has no proof_path', async () => {
+    insertStamp(db, { id: 'np-id', hash: 'a'.repeat(64), proof_path: '/tmp/will-be-nulled.ots' })
+    db.run('UPDATE stamps SET proof_path = NULL WHERE id = ?', ['np-id'])
+
+    const result = await verifyTimestamp({ id: 'np-id' }, db, MOCK_CONFIG)
+    expect(result).toMatchObject({ error: 'storage_error' })
+  })
+
+  it('returns storage_error when the proof file has been deleted from disk', async () => {
+    insertStamp(db, { id: 'del-id', hash: 'a'.repeat(64), proof_path: '/nonexistent/deleted.ots' })
+
+    const result = await verifyTimestamp({ id: 'del-id' }, db, MOCK_CONFIG)
+    expect(result).toMatchObject({ error: 'storage_error' })
+  })
 })
