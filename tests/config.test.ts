@@ -3,7 +3,7 @@ import { writeFileSync, mkdirSync } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
 import { loadConfig, getDataDir } from '../src/config.js'
-import { DEFAULT_CALENDAR_URLS } from '@otskit/core'
+import { DEFAULT_CALENDARS as DEFAULT_CALENDAR_URLS } from '@otskit/client'
 
 const ORIG = process.env.OTS_MCP_DATA_DIR
 
