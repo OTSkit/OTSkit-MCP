@@ -1,6 +1,5 @@
-import { readFileSync } from 'fs'
-import { OpenTimestampsClient, UpgradeError } from '@otskit/client'
-import { DetachedTimestampFile } from '@otskit/client'
+import { readFileSync } from 'node:fs'
+import { OpenTimestampsClient, UpgradeError, DetachedTimestampFile } from '@otskit/client'
 import type { DatabaseLike } from '../db/driver.js'
 import type { Config } from '../types.js'
 import { getStamp, updateStampStatus } from '../db/stamps.js'

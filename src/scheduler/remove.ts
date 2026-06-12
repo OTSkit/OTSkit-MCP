@@ -1,4 +1,4 @@
-import { execFileSync } from 'child_process'
+import { execFileSync } from 'node:child_process'
 
 export async function removeScheduler(): Promise<void> {
   if (process.platform === 'win32') {

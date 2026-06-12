@@ -1,4 +1,4 @@
-import { exec } from 'child_process'
+import { exec } from 'node:child_process'
 import { normalizeWatchInterval } from './watch.js'
 
 export function openWatchWindow(intervalMinutes?: number): { opened: boolean; interval_minutes: number; error?: string } {

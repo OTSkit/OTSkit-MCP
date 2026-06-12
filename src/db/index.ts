@@ -1,6 +1,6 @@
-import { createRequire } from 'module'
-import { join } from 'path'
-import { mkdirSync, statSync } from 'fs'
+import { createRequire } from 'node:module'
+import { join } from 'node:path'
+import { mkdirSync, statSync } from 'node:fs'
 import { getDataDir } from '../config.js'
 import { initDb } from './schema.js'
 import type { DatabaseLike } from './driver.js'
@@ -25,7 +25,7 @@ export function resetDbForTests(): void {
 }
 
 export function backupDb(destPath: string): void {
-  const escaped = destPath.replace(/'/g, "''")
+  const escaped = destPath.replaceAll("'", "''")
   getDb().exec(`VACUUM INTO '${escaped}'`)
 }
 

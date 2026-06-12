@@ -14,7 +14,9 @@ export async function stampFile(
   try {
     hash = await hashFileStreaming(v.path, config.preserve_max_bytes)
   } catch (e: any) {
-    if (String(e?.message).startsWith('file_too_large')) return { error: 'file_too_large', details: e.message }
+    if (String(e?.message).startsWith('file_too_large')) {
+      return { error: 'file_too_large', details: e.message }
+    }
     /* c8 ignore next */ throw e
   }
   return createTimestamp({ hash }, db, config)

@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs'
+import { readFileSync } from 'node:fs'
 import { OpenTimestampsClient } from '@otskit/client'
 import type { VerificationResult } from '@otskit/client'
 import type { DatabaseLike } from '../db/driver.js'

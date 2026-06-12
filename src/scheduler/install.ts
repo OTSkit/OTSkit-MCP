@@ -6,7 +6,7 @@ import { which, escapeXml } from '../utils.js'
 
 export async function installScheduler(args: string[]): Promise<void> {
   const intervalIdx = args.indexOf('--interval')
-  const parsedInterval = intervalIdx !== -1 ? parseInt(args[intervalIdx + 1] ?? '30') : 30
+  const parsedInterval = intervalIdx !== -1 ? Number.parseInt(args[intervalIdx + 1] ?? '30', 10) : 30
   const interval = Math.max(1, Math.min(1440, Number.isFinite(parsedInterval) ? parsedInterval : 30))
   const bin = which('ots-mcp') ?? process.argv[1]
 

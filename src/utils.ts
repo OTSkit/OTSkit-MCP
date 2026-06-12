@@ -1,9 +1,9 @@
-import { execFileSync } from 'child_process'
-import { writeFileSync, renameSync, realpathSync, statSync, createReadStream } from 'fs'
-import { resolve, sep } from 'path'
-import { createHash } from 'crypto'
-import { pipeline } from 'stream/promises'
-import { Transform } from 'stream'
+import { execFileSync } from 'node:child_process'
+import { writeFileSync, renameSync, realpathSync, statSync, createReadStream } from 'node:fs'
+import { resolve, sep } from 'node:path'
+import { createHash } from 'node:crypto'
+import { pipeline } from 'node:stream/promises'
+import { Transform } from 'node:stream'
 
 export function which(cmd: string): string | null {
   try {
@@ -27,11 +27,11 @@ export function writeAtomic(dest: string, data: Uint8Array | Buffer): void {
 // double-escaping the entities produced by the others.
 export function escapeXml(raw: string): string {
   return raw
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;')
 }
 
 export type PathError = 'invalid_path' | 'path_not_allowed' | 'not_a_regular_file'

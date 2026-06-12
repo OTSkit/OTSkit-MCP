@@ -1,4 +1,4 @@
-import { readFileSync, statSync } from 'fs'
+import { readFileSync, statSync } from 'node:fs'
 import { DetachedTimestampFile } from '@otskit/client'
 import type { DatabaseLike } from '../db/driver.js'
 import type { Config } from '../types.js'

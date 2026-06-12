@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs'
-import { join } from 'path'
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
+import { join } from 'node:path'
 
 function getConfigPath(): string {
   if (process.platform === 'win32') {

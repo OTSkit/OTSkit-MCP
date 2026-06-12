@@ -50,10 +50,11 @@ switch (command) {
   }
   case 'watch': {
     const { normalizeWatchInterval, watchPending } = await import('./tools/watch.js')
-    const parsed = args[0] ? parseInt(args[0], 10) : NaN
-    const interval = normalizeWatchInterval(isNaN(parsed) ? undefined : parsed)
-    if (args[0] && (isNaN(parsed) || parsed < 15))
+    const parsed = args[0] ? Number.parseInt(args[0], 10) : Number.NaN
+    const interval = normalizeWatchInterval(Number.isNaN(parsed) ? undefined : parsed)
+    if (args[0] && (Number.isNaN(parsed) || parsed < 15)) {
       process.stderr.write(`Invalid interval "${args[0]}", using ${interval} min\n`)
+    }
     await watchPending(interval)
     break
   }

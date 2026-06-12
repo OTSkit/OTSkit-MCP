@@ -17,7 +17,12 @@ import { featureDisabledError } from './feature-gate.js'
 
 export async function runServer(): Promise<void> {
   let config: ReturnType<typeof loadConfig> | null = null
-  const getConfig = () => { if (!config) config = loadConfig(); return config }
+  const getConfig = () => {
+    if (!config) {
+      config = loadConfig()
+    }
+    return config
+  }
 
   const server = new Server(
     { name: 'ots-mcp', version: '0.1.0' },
