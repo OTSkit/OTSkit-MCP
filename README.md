@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/OTSkit/OTSkit-MCP/master/docs/header.png" alt="OTSkit.ts MCP" width="480" />
+  <img src="docs/header.png" alt="OTSkit MCP" width="480" />
 </p>
 
 # @otskit/mcp
@@ -18,7 +18,7 @@ OpenTimestamps MCP server - stamp, upgrade, and verify Bitcoin timestamps via AI
 
 Exposes a set of tools to any MCP-compatible agent so it can timestamp documents, monitor confirmation status, and verify proofs against the Bitcoin blockchain - all from a conversation.
 
-> **Note on confirmation times:** After stamping, a proof is `pending` until Bitcoin confirms it. This typically takes **~60 minutes** but can take **several hours** during network congestion. Use `ots-mcp watch` or `upgrade_timestamp` to monitor. A pending status is not an error.
+> **Note on confirmation times:** After stamping, a proof is `pending` until Bitcoin confirms it. Confirmations typically arrive within **10–60 minutes**, but can take **several hours** during network congestion. Use `ots-mcp watch` or `upgrade_timestamp` to monitor. A pending proof is not a failed proof.
 
 ## Install
 
@@ -104,7 +104,8 @@ npm test         # run tests
 
 ## Dependencies
 
-- [`@otskit/core`](https://github.com/OTSkit/otskit-core) - OpenTimestamps core logic
-- [`@otskit/client`](https://github.com/OTSkit/otskit-client) - OTS calendar client
+- [`@otskit/client`](https://github.com/OTSkit/OTSkit-client) - OTS calendar client (brings in [`@otskit/core`](https://github.com/OTSkit/OTSkit-core), the protocol engine)
 - [`@modelcontextprotocol/sdk`](https://github.com/modelcontextprotocol/typescript-sdk) - MCP SDK
 - `node-sqlite3-wasm` - local database (pure WASM, no native compilation)
+
+Requires Node.js >= 20.
