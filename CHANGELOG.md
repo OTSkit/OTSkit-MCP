@@ -1,3 +1,10 @@
+## [0.8.1](https://github.com/OTSkit/OTSkit-MCP/compare/v0.8.0...v0.8.1) (2026-06-12)
+
+
+### Bug Fixes
+
+* write scheduler task XML to a private random temp dir and clean it up ([6288e53](https://github.com/OTSkit/OTSkit-MCP/commit/6288e537f99bdd024b2cdd9811087308e8c554f7))
+
 # [0.8.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.6...v0.8.0) (2026-06-12)
 
 
