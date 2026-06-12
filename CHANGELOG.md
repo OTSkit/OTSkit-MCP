@@ -1,3 +1,10 @@
+# [0.8.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.6...v0.8.0) (2026-06-12)
+
+
+### Features
+
+* require Node >=20 and upgrade @otskit/client to 0.5 ([1962673](https://github.com/OTSkit/OTSkit-MCP/commit/196267344379ba1164f21018a6ed2cf72abef757))
+
 ## [0.7.6](https://github.com/OTSkit/OTSkit-MCP/compare/v0.7.5...v0.7.6) (2026-06-11)
 
 
