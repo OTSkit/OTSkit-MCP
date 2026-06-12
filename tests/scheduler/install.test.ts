@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { mkdtempSync, rmSync, existsSync, readFileSync } from 'fs'
-import { join } from 'path'
+import { mkdtempSync, rmSync, existsSync, readFileSync, readdirSync } from 'fs'
+import { join, dirname, basename } from 'path'
 import { tmpdir } from 'os'
 
 // No external const variables — factories are hoisted before const declarations.
@@ -38,17 +38,34 @@ afterEach(() => {
 })
 
 describe('installScheduler — Windows', () => {
-  beforeEach(() => setPlatform('win32' as NodeJS.Platform))
+  // The XML file is deleted before installScheduler returns, so its content
+  // is captured at the moment schtasks reads it.
+  let capturedXml: { path: string; content: string } | null
 
-  it('writes the Task XML file and calls schtasks /create', async () => {
+  beforeEach(() => {
+    setPlatform('win32' as NodeJS.Platform)
+    capturedXml = null
+    vi.mocked(execFileSync).mockImplementation((cmd: any, cmdArgs?: any) => {
+      if (cmd === 'where' || cmd === 'which') return Buffer.from('/fake/ots-mcp')
+      if (cmd === 'schtasks') {
+        const xmlPath = cmdArgs[cmdArgs.indexOf('/xml') + 1]
+        capturedXml = { path: xmlPath, content: readFileSync(xmlPath, 'utf8') }
+      }
+      return Buffer.from('')
+    })
+  })
+
+  it('writes the Task XML in a private random temp dir and calls schtasks /create', async () => {
     const out: string[] = []
     vi.spyOn(process.stdout, 'write').mockImplementation((s) => { out.push(String(s)); return true })
 
     await installScheduler([])
 
-    const xmlPath = join(tmpDir, 'ots-mcp-task.xml')
-    expect(existsSync(xmlPath)).toBe(true)
-    expect(readFileSync(xmlPath, 'utf8')).toContain('<Task')
+    expect(capturedXml).not.toBeNull()
+    expect(capturedXml!.content).toContain('<Task')
+    // Random per-invocation directory, not a predictable path in the shared temp dir
+    expect(dirname(capturedXml!.path)).not.toBe(tmpDir)
+    expect(basename(dirname(capturedXml!.path))).toMatch(/^ots-mcp-/)
     expect(execFileSync).toHaveBeenCalledWith(
       'schtasks',
       expect.arrayContaining(['/create', '/tn', 'ots-mcp-check-pending']),
@@ -56,23 +73,45 @@ describe('installScheduler — Windows', () => {
     expect(out.join('')).toContain('Scheduler installed')
   })
 
+  it('cleans up the XML file and its temp dir after installing', async () => {
+    vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+
+    await installScheduler([])
+
+    expect(capturedXml).not.toBeNull()
+    expect(existsSync(capturedXml!.path)).toBe(false)
+    expect(existsSync(dirname(capturedXml!.path))).toBe(false)
+  })
+
+  it('cleans up the temp dir even when schtasks fails', async () => {
+    vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    vi.mocked(execFileSync).mockImplementation((cmd: any) => {
+      if (cmd === 'where' || cmd === 'which') return Buffer.from('/fake/ots-mcp')
+      if (cmd === 'schtasks') throw new Error('schtasks failed')
+      return Buffer.from('')
+    })
+
+    await expect(installScheduler([])).rejects.toThrow('schtasks failed')
+    // No leftover directories in the temp root
+    expect(readdirSync(tmpDir)).toEqual([])
+  })
+
   it('uses the --interval argument when provided', async () => {
     vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
 
     await installScheduler(['--interval', '60'])
 
-    const xmlPath = join(tmpDir, 'ots-mcp-task.xml')
-    expect(readFileSync(xmlPath, 'utf8')).toContain('PT60M')
+    expect(capturedXml!.content).toContain('PT60M')
   })
 
   it('clamps interval: below 1 becomes 1, above 1440 becomes 1440', async () => {
     vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
 
     await installScheduler(['--interval', '0'])
-    expect(readFileSync(join(tmpDir, 'ots-mcp-task.xml'), 'utf8')).toContain('PT1M')
+    expect(capturedXml!.content).toContain('PT1M')
 
     await installScheduler(['--interval', '9999'])
-    expect(readFileSync(join(tmpDir, 'ots-mcp-task.xml'), 'utf8')).toContain('PT1440M')
+    expect(capturedXml!.content).toContain('PT1440M')
   })
 
   it('falls back to 30 minutes when --interval value is not a number', async () => {
@@ -80,7 +119,7 @@ describe('installScheduler — Windows', () => {
 
     await installScheduler(['--interval', 'abc'])
 
-    expect(readFileSync(join(tmpDir, 'ots-mcp-task.xml'), 'utf8')).toContain('PT30M')
+    expect(capturedXml!.content).toContain('PT30M')
   })
 })
 
