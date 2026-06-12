@@ -10,6 +10,7 @@
 [![TypeScript](https://img.shields.io/npm/dependency-version/@otskit/mcp/dev/typescript?label=TypeScript)](https://www.typescriptlang.org/)
 [![Node](https://img.shields.io/node/v/@otskit/mcp)](https://nodejs.org)
 [![Coverage](https://codecov.io/gh/OTSkit/OTSkit-MCP/branch/main/graph/badge.svg)](https://codecov.io/gh/OTSkit/OTSkit-MCP)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=OTSkit_OTSkit-MCP&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=OTSkit_OTSkit-MCP)
 [![License](https://img.shields.io/npm/l/@otskit/mcp)](LICENSE)
 [![Glama](https://glama.ai/mcp/servers/OTSkit/OTSkit-MCP/badges/score.svg)](https://glama.ai/mcp/servers/OTSkit/OTSkit-MCP)
 [![smithery badge](https://smithery.ai/badge/otskit/otskit-mcp)](https://smithery.ai/servers/otskit/otskit-mcp)
