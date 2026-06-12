@@ -1,3 +1,10 @@
+## [0.8.2](https://github.com/OTSkit/OTSkit-MCP/compare/v0.8.1...v0.8.2) (2026-06-12)
+
+
+### Bug Fixes
+
+* Dockerfile entrypoint must run the serve command ([cceaa08](https://github.com/OTSkit/OTSkit-MCP/commit/cceaa088831a21d09ded2e778df1e2ee7f0157d5))
+
 ## [0.8.1](https://github.com/OTSkit/OTSkit-MCP/compare/v0.8.0...v0.8.1) (2026-06-12)
 
 
