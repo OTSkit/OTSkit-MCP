@@ -12,12 +12,15 @@
 [![Coverage](https://codecov.io/gh/OTSkit/OTSkit-MCP/branch/main/graph/badge.svg)](https://codecov.io/gh/OTSkit/OTSkit-MCP)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=OTSkit_OTSkit-MCP&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=OTSkit_OTSkit-MCP)
 [![License](https://img.shields.io/npm/l/@otskit/mcp)](LICENSE)
-[![Glama](https://glama.ai/mcp/servers/OTSkit/OTSkit-MCP/badges/score.svg)](https://glama.ai/mcp/servers/OTSkit/OTSkit-MCP)
 [![smithery badge](https://smithery.ai/badge/otskit/otskit-mcp)](https://smithery.ai/servers/otskit/otskit-mcp)
 
 OpenTimestamps MCP server - stamp, upgrade, and verify Bitcoin timestamps via AI agents.
 
 Exposes a set of tools to any MCP-compatible agent so it can timestamp documents, monitor confirmation status, and verify proofs against the Bitcoin blockchain - all from a conversation.
+
+<a href="https://glama.ai/mcp/servers/@OTSkit/OTSkit-MCP">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@OTSkit/OTSkit-MCP/badge" alt="OTSkit MCP server on Glama — security, license and quality rating plus download count" />
+</a>
 
 > **Note on confirmation times:** After stamping, a proof is `pending` until Bitcoin confirms it. Confirmations typically arrive within **~60 minutes**, but can take **several hours** during network congestion. Use `ots-mcp watch` or `upgrade_timestamp` to monitor. A pending proof is not a failed proof.
 
