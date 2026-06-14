@@ -51,7 +51,7 @@ jobs:
           node-version: '22.x'
       - run: pnpm install
       - run: pnpm coverage
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: OTSkit/OTSkit-mcp
