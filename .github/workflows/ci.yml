@@ -79,7 +79,7 @@ jobs:
           node-version: '22.x'
       - run: pnpm install
       - run: pnpm coverage
-      - uses: SonarSource/sonarqube-scan-action@v6
+      - uses: SonarSource/sonarqube-scan-action@v8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
