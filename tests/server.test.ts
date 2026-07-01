@@ -13,10 +13,10 @@ const mockServer = {
 }
 
 vi.mock('@modelcontextprotocol/sdk/server/index.js', () => ({
-  Server: vi.fn(() => mockServer),
+  Server: vi.fn(function() { return mockServer }),
 }))
 vi.mock('@modelcontextprotocol/sdk/server/stdio.js', () => ({
-  StdioServerTransport: vi.fn(() => ({})),
+  StdioServerTransport: vi.fn(function() { return {} }),
 }))
 
 // ── DB + config + feature-gate mocks ──────────────────────────────────────────

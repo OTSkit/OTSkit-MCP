@@ -8,9 +8,11 @@ import { initDb } from '../../src/db/schema.js'
 import type { Config } from '../../src/types.js'
 
 vi.mock('@otskit/client', () => ({
-  OpenTimestampsClient: vi.fn().mockImplementation(() => ({
-    stamp: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
-  })),
+  OpenTimestampsClient: vi.fn().mockImplementation(function() {
+    return {
+      stamp: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
+    }
+  }),
   DEFAULT_CALENDARS: [
     'https://alice.btc.calendar.opentimestamps.org',
     'https://bob.btc.calendar.opentimestamps.org',
@@ -39,10 +41,12 @@ beforeEach(() => {
   mkdirSync(join(tmpDir, 'proofs'), { recursive: true })
   db = makeRawDb()
   initDb(db)
-  vi.mocked(OpenTimestampsClient).mockImplementation(() => ({
-    stamp: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
-    verify: vi.fn(),
-  }))
+  vi.mocked(OpenTimestampsClient).mockImplementation(function() {
+    return {
+      stamp: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
+      verify: vi.fn(),
+    }
+  })
 })
 
 afterEach(() => {
@@ -89,10 +93,12 @@ describe('stampFile', () => {
   })
 
   it('returns calendar_error when the OTS client stamp() rejects', async () => {
-    vi.mocked(OpenTimestampsClient).mockImplementation(() => ({
-      stamp: vi.fn().mockRejectedValue(new Error('calendar unreachable')),
-      verify: vi.fn(),
-    }))
+    vi.mocked(OpenTimestampsClient).mockImplementation(function() {
+      return {
+        stamp: vi.fn().mockRejectedValue(new Error('calendar unreachable')),
+        verify: vi.fn(),
+      }
+    })
     const file = join(tmpDir, 'err.txt')
     writeFileSync(file, 'data')
     const result = await stampFile({ path: file }, db, MOCK_CONFIG)

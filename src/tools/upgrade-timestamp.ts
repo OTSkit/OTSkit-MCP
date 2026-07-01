@@ -10,10 +10,13 @@ type UpgradeTimestampConfirmed = { id: string; status: 'confirmed'; bitcoin_bloc
 type UpgradeTimestampPending   = { id: string; status: 'pending'; attempt_count: number; last_attempt_at: string; next_retry_at: string }
 type UpgradeTimestampErr       = { error: 'not_found' | 'calendar_error' | 'storage_error'; details: string }
 
-function collectAttestations(ts: any): any[] {
-  const atts = [...ts.attestations]
-  for (const branch of ts.branches) {
-    atts.push(...collectAttestations(branch.stamp))
+function collectAttestations(ts: any, depth = 0): any[] {
+  if (!ts || depth > 20) return []
+  const atts = [...(ts.attestations ?? [])]
+  for (const branch of (ts.branches ?? [])) {
+    if (branch?.stamp) {
+      atts.push(...collectAttestations(branch.stamp, depth + 1))
+    }
   }
   return atts
 }

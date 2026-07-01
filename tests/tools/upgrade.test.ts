@@ -19,10 +19,12 @@ const { mockUpgrade, mockVerify, MockUpgradeError, mockDeserialize } = vi.hoiste
 })
 
 vi.mock('@otskit/client', () => ({
-  OpenTimestampsClient: vi.fn().mockImplementation(() => ({
-    upgrade: mockUpgrade,
-    verify: mockVerify,
-  })),
+  OpenTimestampsClient: vi.fn().mockImplementation(function() {
+    return {
+      upgrade: mockUpgrade,
+      verify: mockVerify,
+    }
+  }),
   UpgradeError: MockUpgradeError,
   DetachedTimestampFile: { deserialize: mockDeserialize },
 }))

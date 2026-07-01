@@ -11,9 +11,11 @@ import type { Config } from '../../src/types.js'
 const mockVerify = vi.fn().mockResolvedValue({ status: 'pending', reason: 'No Bitcoin attestation found — timestamp not yet confirmed' })
 
 vi.mock('@otskit/client', () => ({
-  OpenTimestampsClient: vi.fn().mockImplementation(() => ({
-    verify: mockVerify,
-  })),
+  OpenTimestampsClient: vi.fn().mockImplementation(function() {
+    return {
+      verify: mockVerify,
+    }
+  }),
 }))
 
 const MOCK_CONFIG: Config = {

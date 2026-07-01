@@ -7,9 +7,11 @@ import { createTimestamp } from '../../src/tools/create-timestamp.js'
 import type { Config } from '../../src/types.js'
 
 vi.mock('@otskit/client', () => ({
-  OpenTimestampsClient: vi.fn().mockImplementation(() => ({
-    stamp: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
-  })),
+  OpenTimestampsClient: vi.fn().mockImplementation(function() {
+    return {
+      stamp: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
+    }
+  }),
   DEFAULT_CALENDARS: [
     'https://alice.btc.calendar.opentimestamps.org',
     'https://bob.btc.calendar.opentimestamps.org',
@@ -83,10 +85,12 @@ describe('stamp', () => {
 
   it('returns calendar_error when the OTS client stamp() rejects', async () => {
     const { OpenTimestampsClient } = await import('@otskit/client')
-    vi.mocked(OpenTimestampsClient).mockImplementationOnce(() => ({
-      stamp: vi.fn().mockRejectedValue(new Error('calendar unreachable')),
-      verify: vi.fn(),
-    }))
+    vi.mocked(OpenTimestampsClient).mockImplementationOnce(function() {
+      return {
+        stamp: vi.fn().mockRejectedValue(new Error('calendar unreachable')),
+        verify: vi.fn(),
+      }
+    })
     const result = await createTimestamp({ hash: 'c'.repeat(64) }, db, MOCK_CONFIG)
     expect(result).toMatchObject({ error: 'calendar_error' })
     expect((result as any).details).toContain('calendar unreachable')
