@@ -1,3 +1,10 @@
+## [0.8.3](https://github.com/OTSkit/OTSkit-MCP/compare/v0.8.2...v0.8.3) (2026-07-01)
+
+
+### Bug Fixes
+
+* patch hono/undici/vite security advisories and upgrade vitest to v4 ([d4f7a4f](https://github.com/OTSkit/OTSkit-MCP/commit/d4f7a4fc957b5bb372633ff842eeb009c4fa9e97))
+
 ## [0.8.2](https://github.com/OTSkit/OTSkit-MCP/compare/v0.8.1...v0.8.2) (2026-06-12)
 
 
