@@ -20,8 +20,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.0
       node-sqlite3-wasm:
-        specifier: 0.8.58
-        version: 0.8.58
+        specifier: 0.8.59
+        version: 0.8.59
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -1664,8 +1664,8 @@ packages:
     resolution: {integrity: sha512-Z3lTE9pLaJF47NyMhd4ww1yFTAP8YhYI8SleJiHzM46Fgpm5cnNzSl9XfzFNqbaz+VlJrIj3fXQ4DeN1Rjm6cw==}
     engines: {node: '>=18'}
 
-  node-sqlite3-wasm@0.8.58:
-    resolution: {integrity: sha512-oXh7/N26JzIZF2jLq6sOUzyT0vh97uyg2259budPaaDFE7vaR1F4RqWT3wc0u7N3zJEup0EPr78jgVypr4/7yQ==}
+  node-sqlite3-wasm@0.8.59:
+    resolution: {integrity: sha512-BsVATSCxLzgpdj6Ey6bZ72MzhkXTCPmb9aVCqyptiwRojo/hzCCoXILoU0SiU7av+iiSyLCTLsCrV96yNUf2/w==}
 
   normalize-package-data@6.0.2:
     resolution: {integrity: sha512-V6gygoYb/5EmNI+MEGrWkC+e6+Rr7mTmfHrxDbLzxQogBkgzo76rkok0Am6thgSF7Mv2nLOajAJj5vDJZEFn7g==}
@@ -4024,7 +4024,7 @@ snapshots:
       emojilib: 2.4.0
       skin-tone: 2.0.0
 
-  node-sqlite3-wasm@0.8.58: {}
+  node-sqlite3-wasm@0.8.59: {}
 
   normalize-package-data@6.0.2:
     dependencies:
