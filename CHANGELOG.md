@@ -1,3 +1,10 @@
+## [0.8.4](https://github.com/OTSkit/OTSkit-MCP/compare/v0.8.3...v0.8.4) (2026-08-05)
+
+
+### Bug Fixes
+
+* bump postcss to 8.5.18 to patch path traversal advisory ([07e9db9](https://github.com/OTSkit/OTSkit-MCP/commit/07e9db9528a89511f3d74b92c2e5b268ffd9b082))
+
 ## [0.8.3](https://github.com/OTSkit/OTSkit-MCP/compare/v0.8.2...v0.8.3) (2026-07-01)
 
 
