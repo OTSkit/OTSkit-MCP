@@ -1,3 +1,10 @@
+## [0.8.5](https://github.com/OTSkit/OTSkit-MCP/compare/v0.8.4...v0.8.5) (2026-08-05)
+
+
+### Bug Fixes
+
+* bump hono and undici to patch remaining security advisories ([0d16373](https://github.com/OTSkit/OTSkit-MCP/commit/0d16373e373392c06d776847bb3701c56660df18))
+
 ## [0.8.4](https://github.com/OTSkit/OTSkit-MCP/compare/v0.8.3...v0.8.4) (2026-08-05)
 
 

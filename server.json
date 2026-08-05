@@ -6,12 +6,12 @@
     "url": "https://github.com/OTSkit/OTSkit-MCP",
     "source": "github"
   },
-  "version": "0.8.4",
+  "version": "0.8.5",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@otskit/mcp",
-      "version": "0.8.4",
+      "version": "0.8.5",
       "transport": {
         "type": "stdio"
       },
