@@ -55,7 +55,9 @@ export async function watchPending(intervalMinutes: number = DEFAULT_WATCH_INTER
 
     const confirmed = db.get(`SELECT COUNT(*) as n FROM stamps WHERE status = 'confirmed'`) as { n: number }
 
-    process.stdout.write(`${now()} - ${rows.length} pending, ${confirmed.n} confirmed\n`)
+    // This query keeps everything that is not confirmed, failed stamps included — calling the
+    // whole set "pending" would report a failure as work still in progress.
+    process.stdout.write(`${now()} - ${rows.length} unconfirmed, ${confirmed.n} confirmed\n`)
 
     for (const row of rows) {
       const next = row.next_retry_at ? ` next ${row.next_retry_at.replace('T', ' ').slice(0, 19)}` : ''

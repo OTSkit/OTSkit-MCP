@@ -55,6 +55,9 @@ export async function verifyTimestamp(
       return { status: 'pending', hash: record.hash, calendars: config.calendars }
 
     case 'invalid':
+      // The chain contradicts the stored proof, so the record must stop claiming otherwise —
+      // a stamp left at 'confirmed' here would outlive the evidence for it.
+      updateStampStatus(db, input.id, { status: 'failed', last_error: result.reason })
       logOperation(db, { stamp_id: input.id, action: 'verify', result: 'failed', error_msg: result.reason })
       return { status: 'invalid', hash: record.hash, reason: result.reason }
 

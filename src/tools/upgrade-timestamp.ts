@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { OpenTimestampsClient, UpgradeError, DetachedTimestampFile } from '@otskit/client'
+import { OpenTimestampsClient, UpgradeError } from '@otskit/client'
 import type { DatabaseLike } from '../db/driver.js'
 import type { Config } from '../types.js'
 import { getStamp, updateStampStatus } from '../db/stamps.js'
@@ -8,30 +8,39 @@ import { writeAtomic } from '../utils.js'
 
 type UpgradeTimestampConfirmed = { id: string; status: 'confirmed'; bitcoin_block: number; bitcoin_time: string }
 type UpgradeTimestampPending   = { id: string; status: 'pending'; attempt_count: number; last_attempt_at: string; next_retry_at: string }
-type UpgradeTimestampErr       = { error: 'not_found' | 'calendar_error' | 'storage_error'; details: string }
+type UpgradeTimestampErr       = { error: 'not_found' | 'calendar_error' | 'storage_error' | 'invalid_proof'; details: string }
 
-function collectAttestations(ts: any, depth = 0): any[] {
-  if (!ts || depth > 20) return []
-  const atts = [...(ts.attestations ?? [])]
-  for (const branch of (ts.branches ?? [])) {
-    if (branch?.stamp) {
-      atts.push(...collectAttestations(branch.stamp, depth + 1))
+type ChainCheck =
+  | { outcome: 'verified'; block: number; time: string }
+  | { outcome: 'unconfirmed' }
+  | { outcome: 'invalid'; reason: string }
+
+/**
+ * A Bitcoin attestation inside the .ots bytes proves nothing on its own: those bytes come from a
+ * calendar or from local disk, and either can carry a forged one. Only the block header settles
+ * it, and it is also the only truthful source of the block time.
+ */
+async function checkAgainstChain(
+  client: OpenTimestampsClient,
+  proof: Buffer,
+  hash: string
+): Promise<ChainCheck> {
+  let result
+  try {
+    result = await client.verify(proof, hash)
+  } catch {
+    // Transport failure — says nothing about the proof, so retry later.
+    return { outcome: 'unconfirmed' }
+  }
+  if (result.status === 'verified') {
+    return {
+      outcome: 'verified',
+      block: result.blockHeight,
+      time: new Date(result.blockTime * 1000).toISOString(),
     }
   }
-  return atts
-}
-
-function checkBitcoinConfirmation(bytes: Buffer): { confirmed: boolean; block?: number } {
-  try {
-    const dtf = DetachedTimestampFile.deserialize(new Uint8Array(bytes))
-    const attestations = collectAttestations(dtf.timestamp)
-    const bitcoinAtts = attestations.filter((a: any) => a.kind === 'bitcoin')
-    if (bitcoinAtts.length === 0) return { confirmed: false }
-    const block = Math.min(...bitcoinAtts.map((a: any) => a.height as number))
-    return { confirmed: true, block }
-  } catch {
-    return { confirmed: false }
-  }
+  if (result.status === 'invalid') return { outcome: 'invalid', reason: result.reason }
+  return { outcome: 'unconfirmed' }
 }
 
 function nextRetryAt(attemptCount: number): string {
@@ -63,45 +72,38 @@ export async function upgradeTimestamp(
   const newAttemptCount = record.attempt_count + 1
   const next = nextRetryAt(newAttemptCount)
 
-  let upgraded: Buffer
+  let upgraded: Buffer | null = null
   try {
     upgraded = await client.upgrade(proofBefore)
   } catch (e) {
-    if (e instanceof UpgradeError) {
-      // Do NOT trust the local .ots attestation — an attacker with write access to the
-      // proofs dir could forge a Bitcoin attestation. Verify against the blockchain instead.
-      try {
-        const v = await client.verify(proofBefore, record.hash)
-        if (v.status === 'verified') {
-          const bitcoinTime = new Date(v.blockTime * 1000).toISOString()
-          updateStampStatus(db, input.id, {
-            status: 'confirmed', bitcoin_block: v.blockHeight, bitcoin_time: bitcoinTime,
-            confirmed_at: now, last_attempt_at: now, attempt_count: newAttemptCount,
-          })
-          logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'success' })
-          return { id: input.id, status: 'confirmed', bitcoin_block: v.blockHeight, bitcoin_time: bitcoinTime }
-        }
-      } catch { /* network error — fall through to pending */ }
-      updateStampStatus(db, input.id, { last_attempt_at: now, attempt_count: newAttemptCount, next_retry_at: next })
-      logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'pending' })
-      return { id: input.id, status: 'pending', attempt_count: newAttemptCount, last_attempt_at: now, next_retry_at: next }
+    if (!(e instanceof UpgradeError)) {
+      updateStampStatus(db, input.id, { last_attempt_at: now, attempt_count: newAttemptCount, last_error: String(e), next_retry_at: next })
+      logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'failed', error_msg: String(e) })
+      return { error: 'calendar_error', details: String(e) }
     }
-    updateStampStatus(db, input.id, { last_attempt_at: now, attempt_count: newAttemptCount, last_error: String(e), next_retry_at: next })
-    logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'failed', error_msg: String(e) })
-    return { error: 'calendar_error', details: String(e) }
+    // No calendar had news. The stored proof is still checked against the chain below: it may
+    // already be complete from an earlier run.
   }
 
-  writeAtomic(record.proof_path, upgraded)
+  if (upgraded !== null) writeAtomic(record.proof_path, upgraded)
 
-  const { confirmed, block } = checkBitcoinConfirmation(upgraded)
-  if (confirmed && block !== undefined) {
-    const bitcoinTime = now
+  const chain = await checkAgainstChain(client, upgraded ?? proofBefore, record.hash)
+
+  if (chain.outcome === 'verified') {
     updateStampStatus(db, input.id, {
-      status: 'confirmed', bitcoin_block: block, bitcoin_time: bitcoinTime,
+      status: 'confirmed', bitcoin_block: chain.block, bitcoin_time: chain.time,
       confirmed_at: now, last_attempt_at: now, attempt_count: newAttemptCount,
     })
     logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'success' })
-    return { id: input.id, status: 'confirmed', bitcoin_block: block, bitcoin_time: bitcoinTime }
+    return { id: input.id, status: 'confirmed', bitcoin_block: chain.block, bitcoin_time: chain.time }
+  }
+
+  if (chain.outcome === 'invalid') {
+    updateStampStatus(db, input.id, {
+      status: 'failed', last_error: chain.reason, last_attempt_at: now, attempt_count: newAttemptCount,
+    })
+    logOperation(db, { stamp_id: input.id, action: 'upgrade', result: 'failed', error_msg: chain.reason })
+    return { error: 'invalid_proof', details: chain.reason }
   }
 
   updateStampStatus(db, input.id, { last_attempt_at: now, attempt_count: newAttemptCount, next_retry_at: next })

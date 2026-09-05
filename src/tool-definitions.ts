@@ -64,7 +64,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'inspect_timestamp',
-    description: 'Reads a stored proof file from disk without any network calls. Returns proof metadata including size, number of calendar attestations (pending promises from OTS servers) and Bitcoin attestations (actual confirmed blocks). A stamp is only truly confirmed when bitcoin_attestations > 0 and bitcoin_confirmed is true — calendar_attestations alone do not prove Bitcoin confirmation.',
+    description: 'Reads a stored proof file from disk without any network calls. Returns proof metadata including size, number of calendar attestations (pending promises from OTS servers) and Bitcoin attestations. has_bitcoin_attestation reports only what the file claims — it is a structural check, not evidence that Bitcoin backs the claim. Use verify_timestamp, which checks the block header on-chain, before telling a user that a stamp is confirmed.',
     inputSchema: {
       type: 'object' as const,
       properties: { id: { type: 'string', description: 'UUID from the stamp record' } },

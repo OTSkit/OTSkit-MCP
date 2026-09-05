@@ -67,7 +67,7 @@ describe('inspect_timestamp', () => {
     expect(result).toHaveProperty('proof_size_bytes', 3)
     expect(result).toHaveProperty('calendar_attestations', 0)
     expect(result).toHaveProperty('bitcoin_attestations', 0)
-    expect(result).toHaveProperty('bitcoin_confirmed', false)
+    expect(result).toHaveProperty('has_bitcoin_attestation', false)
   })
 
   it('extracts bitcoin block height when attestation is present', async () => {
@@ -90,7 +90,7 @@ describe('inspect_timestamp', () => {
     expect(result).not.toHaveProperty('error')
     if (!('error' in result)) {
       expect(result.bitcoin_attestations).toBe(2)
-      expect(result.bitcoin_confirmed).toBe(true)
+      expect(result.has_bitcoin_attestation).toBe(true)
       expect(result.bitcoin_block).toBe(850000) // Math.min(850000, 851000)
     }
   })

@@ -14,7 +14,7 @@ type InspectOk  = {
   proof_size_bytes: number
   calendar_attestations: number
   bitcoin_attestations: number
-  bitcoin_confirmed: boolean
+  has_bitcoin_attestation: boolean
   bitcoin_block: number | null
 }
 
@@ -61,7 +61,9 @@ export function inspectTimestamp(
     proof_size_bytes: proofSize,
     calendar_attestations: calendarAttestations,
     bitcoin_attestations: bitcoinAttestations,
-    bitcoin_confirmed: bitcoinAttestations > 0,
+    // Structural only: this tool never touches the network, so it can report that an
+    // attestation is present but not that Bitcoin backs it. That is verify_timestamp's job.
+    has_bitcoin_attestation: bitcoinAttestations > 0,
     bitcoin_block: bitcoinBlock,
   }
 }

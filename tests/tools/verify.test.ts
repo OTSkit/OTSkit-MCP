@@ -3,7 +3,7 @@ import { makeRawDb } from '../helpers/db.js'
 import type { DatabaseLike } from '../../src/db/driver.js'
 import { writeFileSync, mkdirSync } from 'fs'
 import { initDb } from '../../src/db/schema.js'
-import { insertStamp, getStamp } from '../../src/db/stamps.js'
+import { insertStamp, getStamp, updateStampStatus } from '../../src/db/stamps.js'
 import { verifyTimestamp } from '../../src/tools/verify-timestamp.js'
 import type { Config } from '../../src/types.js'
 
@@ -79,6 +79,28 @@ describe('verify', () => {
     const result = await verifyTimestamp({ id: 'i-id' }, db, MOCK_CONFIG)
     expect(result).toMatchObject({ status: 'invalid', hash: 'a'.repeat(64), reason: 'File hash does not match proof' })
     expect(getStamp(db, 'i-id')?.status).not.toBe('confirmed')
+  })
+
+  it('downgrades an already confirmed stamp when the chain contradicts it', async () => {
+    mockVerify.mockResolvedValueOnce({ status: 'invalid', reason: 'File hash does not match proof' })
+
+    const proofPath = process.env.OTS_MCP_DATA_DIR + '/proofs/was-confirmed.ots'
+    writeFileSync(proofPath, Buffer.from([1, 2, 3]))
+    insertStamp(db, { id: 'dg-id', hash: 'a'.repeat(64), proof_path: proofPath })
+    updateStampStatus(db, 'dg-id', {
+      status: 'confirmed',
+      bitcoin_block: 850000,
+      bitcoin_time: new Date(1_700_000_000 * 1000).toISOString(),
+      confirmed_at: new Date().toISOString(),
+    })
+    expect(getStamp(db, 'dg-id')?.status).toBe('confirmed')
+
+    const result = await verifyTimestamp({ id: 'dg-id' }, db, MOCK_CONFIG)
+
+    expect(result).toMatchObject({ status: 'invalid' })
+    const record = getStamp(db, 'dg-id')
+    expect(record?.status).toBe('failed')
+    expect(record?.last_error).toBe('File hash does not match proof')
   })
 
   it('returns network_error when the explorer is unreachable', async () => {
