@@ -1,3 +1,10 @@
+# [0.9.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.8.5...v0.9.0) (2026-09-06)
+
+
+### Features
+
+* verify external OpenTimestamps proofs ([fb4bdd7](https://github.com/OTSkit/OTSkit-MCP/commit/fb4bdd74f45472cd9a7f6c125cca61b3c4b00734))
+
 ## [0.8.5](https://github.com/OTSkit/OTSkit-MCP/compare/v0.8.4...v0.8.5) (2026-08-05)
 
 
