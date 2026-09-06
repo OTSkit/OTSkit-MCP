@@ -90,7 +90,7 @@ afterAll(() => {
 
 describe('MCP server — E2E', () => {
 
-  it('tools/list devuelve las 8 herramientas esperadas', async () => {
+  it('tools/list devuelve las 9 herramientas esperadas', async () => {
     const res = await client.request('tools/list', {})
     const tools = ((res as any).result?.tools ?? []) as { name: string }[]
     const names = tools.map(t => t.name).sort()
@@ -98,12 +98,13 @@ describe('MCP server — E2E', () => {
     expect(names).toContain('create_timestamp')
     expect(names).toContain('upgrade_timestamp')
     expect(names).toContain('verify_timestamp')
+    expect(names).toContain('verify_external_proof')
     expect(names).toContain('inspect_timestamp')
     expect(names).toContain('list_pending')
     expect(names).toContain('stamp_file')
     expect(names).toContain('hash_file')
     expect(names).toContain('watch')
-    expect(names).toHaveLength(8)
+    expect(names).toHaveLength(9)
   }, 10000)
 
   it('list_pending sobre DB vacía devuelve items:[] total:0', async () => {

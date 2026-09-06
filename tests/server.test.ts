@@ -31,7 +31,8 @@ const MOCK_CONFIG: Config = {
   calendars: ['https://alice.btc.calendar.opentimestamps.org'],
 }
 
-vi.mock('../src/db/index.js', () => ({ getDb: () => db, resetDbForTests: vi.fn() }))
+const mockGetDb = vi.fn(() => db)
+vi.mock('../src/db/index.js', () => ({ getDb: () => mockGetDb(), resetDbForTests: vi.fn() }))
 vi.mock('../src/config.js', () => ({ loadConfig: () => MOCK_CONFIG, getDataDir: () => '/tmp/test' }))
 vi.mock('../src/feature-gate.js', () => ({ featureDisabledError: vi.fn().mockReturnValue(null) }))
 
@@ -39,6 +40,7 @@ vi.mock('../src/feature-gate.js', () => ({ featureDisabledError: vi.fn().mockRet
 const mockCreate  = vi.fn()
 const mockUpgrade = vi.fn()
 const mockVerify  = vi.fn()
+const mockVerifyExternal = vi.fn()
 const mockInspect = vi.fn()
 const mockList    = vi.fn()
 const mockHash    = vi.fn()
@@ -48,6 +50,7 @@ const mockWatch   = vi.fn()
 vi.mock('../src/tools/create-timestamp.js',  () => ({ createTimestamp:  (...a: any[]) => mockCreate(...a)  }))
 vi.mock('../src/tools/upgrade-timestamp.js', () => ({ upgradeTimestamp: (...a: any[]) => mockUpgrade(...a) }))
 vi.mock('../src/tools/verify-timestamp.js',  () => ({ verifyTimestamp:  (...a: any[]) => mockVerify(...a)  }))
+vi.mock('../src/tools/verify-external-proof.js', () => ({ verifyExternalProof: (...a: any[]) => mockVerifyExternal(...a) }))
 vi.mock('../src/tools/inspect-timestamp.js', () => ({ inspectTimestamp: (...a: any[]) => mockInspect(...a) }))
 vi.mock('../src/tools/list-pending.js',      () => ({ listPending:      (...a: any[]) => mockList(...a)    }))
 vi.mock('../src/tools/hash-file.js',         () => ({ hashFileTool:     (...a: any[]) => mockHash(...a)    }))
@@ -144,6 +147,15 @@ describe('runServer — CallTool dispatch', () => {
     mockVerify.mockResolvedValue({ status: 'pending', hash: HASH, calendars: [] })
     const res = await callToolHandler({ params: { name: 'verify_timestamp', arguments: { id: 'v1' } } })
     expect(mockVerify).toHaveBeenCalled()
+    expect(res.isError).toBe(false)
+  })
+
+  it('routes verify_external_proof without a database operation', async () => {
+    mockVerifyExternal.mockResolvedValue({ status: 'pending', hash: HASH, calendars: [] })
+    const input = { file_path: '/tmp/record.json', proof_path: '/tmp/record.json.ots' }
+    const res = await callToolHandler({ params: { name: 'verify_external_proof', arguments: input } })
+    expect(mockVerifyExternal).toHaveBeenCalledWith(input, MOCK_CONFIG)
+    expect(mockGetDb).not.toHaveBeenCalled()
     expect(res.isError).toBe(false)
   })
 

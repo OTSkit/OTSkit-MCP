@@ -26,3 +26,8 @@ export const ListInput = z.strictObject({
 export const WatchInput = z.strictObject({
   interval_minutes: z.number().int().min(15).max(1440).optional(),
 })
+
+export const VerifyExternalProofInput = z.strictObject({
+  file_path: z.string().min(1).max(4096),
+  proof_path: z.string().min(1).max(4096),
+})

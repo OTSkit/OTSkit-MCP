@@ -62,6 +62,7 @@ Each command writes the MCP entry into the agent's config file, makes a `.bak` b
 | `create_timestamp` | Stamp a SHA-256 hash against 4 public OTS calendars |
 | `upgrade_timestamp` | Check if a pending stamp has been confirmed in Bitcoin |
 | `verify_timestamp` | Verify a stamp - proves hash existed before a given Bitcoin block |
+| `verify_external_proof` | Verify a whitelisted local file against its external `.ots` proof, without changing the local stamp store |
 | `inspect_timestamp` | Inspect a stored proof file without network calls |
 | `list_pending` | List stamps with status, retry count, and filters |
 | `watch` | Open a terminal window monitoring pending stamps and attempting due upgrades |
