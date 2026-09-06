@@ -120,4 +120,43 @@ describe('verifyExternalProof', () => {
     const result = await verifyExternalProof({ file_path: recordPath, proof_path: proofPath }, config())
     expect(result).toMatchObject({ status: 'network_error', hash: HASH, details: 'Error: explorer unavailable' })
   })
+
+  // A receipt whose calendars have not yet made it into a block is the ordinary
+  // state of a fresh stamp, and it must never be dressed up as a confirmation.
+  it('reports a receipt still waiting on a block as pending', async () => {
+    mockVerify.mockResolvedValueOnce({ status: 'pending' })
+    const result = await verifyExternalProof({ file_path: recordPath, proof_path: proofPath }, config())
+    expect(result).toMatchObject({
+      status: 'pending',
+      hash: HASH,
+      calendars: ['https://alice.btc.calendar.opentimestamps.org'],
+    })
+    expect(result).not.toHaveProperty('bitcoin_block')
+  })
+
+  // The verifier can report an unreachable explorer instead of throwing, which
+  // is a different path from a rejected promise and must not read as verified.
+  it('passes through a network error reported by the verifier', async () => {
+    mockVerify.mockResolvedValueOnce({ status: 'network_error', reason: 'esplora timeout' })
+    const result = await verifyExternalProof({ file_path: recordPath, proof_path: proofPath }, config())
+    expect(result).toMatchObject({ status: 'network_error', hash: HASH, details: 'esplora timeout' })
+    expect(result).not.toHaveProperty('bitcoin_block')
+  })
+
+  it('rejects an oversized covered file before verifying', async () => {
+    writeFileSync(recordPath, Buffer.alloc(2048))
+    const result = await verifyExternalProof({ file_path: recordPath, proof_path: proofPath }, config())
+    expect(result).toMatchObject({ error: 'file_too_large' })
+    expect(mockVerify).not.toHaveBeenCalled()
+  })
+
+  it('does not swallow an unexpected hashing failure', async () => {
+    const utils = await import('../../src/utils.js')
+    const spy = vi.spyOn(utils, 'hashFileStreaming').mockRejectedValueOnce(new Error('disk fell over'))
+    await expect(
+      verifyExternalProof({ file_path: recordPath, proof_path: proofPath }, config())
+    ).rejects.toThrow('disk fell over')
+    expect(mockVerify).not.toHaveBeenCalled()
+    spy.mockRestore()
+  })
 })
