@@ -46,7 +46,7 @@ export const TOOL_DEFINITIONS = [
   },
   {
     name: 'verify_external_proof',
-    description: 'Verifies an external OpenTimestamps .ots file against its covered local file. Both paths must pass the configured directory whitelist and size cap. It does not read or modify the local stamp store. A confirmed result proves the file hash existed before the reported Bitcoin block; it does NOT prove authorship, content truth, legal validity, or preservation of linked assets.',
+    description: 'Verifies an external OpenTimestamps .ots file against its covered local file. Both paths must pass the configured directory whitelist; the covered file uses the preservation size cap and the receipt has a separate 1 MiB cap. It does not read or modify the local stamp store. A confirmed result proves the file hash existed before the reported Bitcoin block; it does NOT prove authorship, content truth, legal validity, or preservation of linked assets.',
     inputSchema: {
       type: 'object' as const,
       properties: {

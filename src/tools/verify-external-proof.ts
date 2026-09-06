@@ -4,6 +4,11 @@ import type { VerificationResult } from '@otskit/client'
 import { hashFileStreaming, validateFilePath } from '../utils.js'
 import type { Config } from '../types.js'
 
+// OTS receipts are normally kilobytes. Keep their limit independent from the
+// large preservation cap used for covered source files, because this tool reads
+// the receipt into memory before the parser receives it.
+const MAX_EXTERNAL_PROOF_BYTES = 1 * 1024 * 1024
+
 type VerifyExternalProofResult =
   | { status: 'confirmed'; hash: string; bitcoin_block: number; bitcoin_time: string }
   | { status: 'pending'; hash: string; calendars: string[] }
@@ -26,8 +31,8 @@ export async function verifyExternalProof(
   if ('error' in proof) return proof
 
   // Reject oversize proof input before loading it or contacting a verifier.
-  if (statSync(proof.path).size > config.preserve_max_bytes) {
-    return { error: 'file_too_large', details: `proof exceeds ${config.preserve_max_bytes} bytes` }
+  if (statSync(proof.path).size > MAX_EXTERNAL_PROOF_BYTES) {
+    return { error: 'file_too_large', details: `proof exceeds ${MAX_EXTERNAL_PROOF_BYTES} bytes` }
   }
 
   let hash: string

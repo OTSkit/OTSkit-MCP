@@ -109,7 +109,7 @@ describe('verifyExternalProof', () => {
   })
 
   it('rejects an oversized proof before reading or verifying it', async () => {
-    writeFileSync(proofPath, Buffer.alloc(1025))
+    writeFileSync(proofPath, Buffer.alloc(1_048_577))
     const result = await verifyExternalProof({ file_path: recordPath, proof_path: proofPath }, config())
     expect(result).toMatchObject({ error: 'file_too_large' })
     expect(mockVerify).not.toHaveBeenCalled()

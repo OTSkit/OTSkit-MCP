@@ -14,6 +14,10 @@ describe('featureDisabledError', () => {
     expect(featureDisabledError('create_timestamp', CFG({ stamp_enabled: false })))
       .toEqual({ error: 'feature_disabled', feature: 'stamp' })
   })
+  it('blocks external proof verification when stamp_enabled is false', () => {
+    expect(featureDisabledError('verify_external_proof', CFG({ stamp_enabled: false })))
+      .toEqual({ error: 'feature_disabled', feature: 'stamp' })
+  })
   it('allows stamp tools when stamp_enabled is true', () => {
     expect(featureDisabledError('create_timestamp', CFG({}))).toBeNull()
   })
