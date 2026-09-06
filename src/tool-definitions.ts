@@ -45,6 +45,24 @@ export const TOOL_DEFINITIONS = [
     },
   },
   {
+    name: 'verify_external_proof',
+    description: 'Verifies an external OpenTimestamps .ots file against its covered local file. Both paths must pass the configured directory whitelist; the covered file uses the preservation size cap and the receipt has a separate 1 MiB cap. It does not read or modify the local stamp store. A confirmed result proves the file hash existed before the reported Bitcoin block; it does NOT prove authorship, content truth, legal validity, or preservation of linked assets.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        file_path: { type: 'string', description: 'Path to the exact file covered by the proof' },
+        proof_path: { type: 'string', description: 'Path to the corresponding .ots proof file' },
+      },
+      required: ['file_path', 'proof_path'],
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: true,
+    },
+  },
+  {
     name: 'inspect_timestamp',
     description: 'Reads a stored proof file from disk without any network calls. Returns proof metadata including size, number of calendar attestations (pending promises from OTS servers) and Bitcoin attestations (actual confirmed blocks). A stamp is only truly confirmed when bitcoin_attestations > 0 and bitcoin_confirmed is true — calendar_attestations alone do not prove Bitcoin confirmation.',
     inputSchema: {

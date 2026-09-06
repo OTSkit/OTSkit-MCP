@@ -6,13 +6,14 @@ import { loadConfig } from './config.js'
 import { createTimestamp } from './tools/create-timestamp.js'
 import { upgradeTimestamp } from './tools/upgrade-timestamp.js'
 import { verifyTimestamp } from './tools/verify-timestamp.js'
+import { verifyExternalProof } from './tools/verify-external-proof.js'
 import { inspectTimestamp } from './tools/inspect-timestamp.js'
 import { listPending } from './tools/list-pending.js'
 import { openWatchWindow } from './tools/watch-window.js'
 import { stampFile } from './tools/stamp-file.js'
 import { hashFileTool } from './tools/hash-file.js'
 import { TOOL_DEFINITIONS } from './tool-definitions.js'
-import { HashInput, IdInput, PathInput, ListInput, WatchInput, parse } from './schemas.js'
+import { HashInput, IdInput, PathInput, ListInput, WatchInput, VerifyExternalProofInput, parse } from './schemas.js'
 import { featureDisabledError } from './feature-gate.js'
 
 export async function runServer(): Promise<void> {
@@ -35,20 +36,20 @@ export async function runServer(): Promise<void> {
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params
-    const db = getDb()
     const config = getConfig()
     const gate = featureDisabledError(name, config)
     if (gate) return { content: [{ type: 'text', text: JSON.stringify(gate) }], isError: true }
     try {
       let result: unknown
       switch (name) {
-        case 'create_timestamp':  result = await createTimestamp(parse(HashInput, args), db, config); break
-        case 'upgrade_timestamp': result = await upgradeTimestamp(parse(IdInput, args), db, config); break
-        case 'verify_timestamp':  result = await verifyTimestamp(parse(IdInput, args), db, config); break
-        case 'inspect_timestamp': result = inspectTimestamp(parse(IdInput, args), db, config); break
-        case 'list_pending':      result = listPending(parse(ListInput, args), db, config); break
+        case 'create_timestamp':  result = await createTimestamp(parse(HashInput, args), getDb(), config); break
+        case 'upgrade_timestamp': result = await upgradeTimestamp(parse(IdInput, args), getDb(), config); break
+        case 'verify_timestamp':  result = await verifyTimestamp(parse(IdInput, args), getDb(), config); break
+        case 'verify_external_proof': result = await verifyExternalProof(parse(VerifyExternalProofInput, args), config); break
+        case 'inspect_timestamp': result = inspectTimestamp(parse(IdInput, args), getDb(), config); break
+        case 'list_pending':      result = listPending(parse(ListInput, args), getDb(), config); break
         case 'hash_file':         result = await hashFileTool(parse(PathInput, args), config); break
-        case 'stamp_file':        result = await stampFile(parse(PathInput, args), db, config); break
+        case 'stamp_file':        result = await stampFile(parse(PathInput, args), getDb(), config); break
         case 'watch':             result = openWatchWindow(parse(WatchInput, args).interval_minutes); break
         default:
           return { content: [{ type: 'text', text: JSON.stringify({ error: 'unknown_tool', tool: name }) }], isError: true }

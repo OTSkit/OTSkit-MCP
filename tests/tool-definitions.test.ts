@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { TOOL_DEFINITIONS } from '../src/tool-definitions.js'
 
-const toolNames = ['create_timestamp', 'upgrade_timestamp', 'verify_timestamp', 'list_pending', 'inspect_timestamp', 'watch']
+const toolNames = ['create_timestamp', 'upgrade_timestamp', 'verify_timestamp', 'verify_external_proof', 'list_pending', 'inspect_timestamp', 'watch']
 
 describe('tool definitions', () => {
   it('exposes all expected tools', () => {
@@ -20,6 +20,13 @@ describe('tool definitions', () => {
 
   it('verify_timestamp is read-only, idempotent, open-world', () => {
     const t = TOOL_DEFINITIONS.find(t => t.name === 'verify_timestamp')!
+    expect(t.annotations?.readOnlyHint).toBe(true)
+    expect(t.annotations?.idempotentHint).toBe(true)
+    expect(t.annotations?.openWorldHint).toBe(true)
+  })
+
+  it('verify_external_proof is read-only, idempotent, open-world', () => {
+    const t = TOOL_DEFINITIONS.find(t => t.name === 'verify_external_proof')!
     expect(t.annotations?.readOnlyHint).toBe(true)
     expect(t.annotations?.idempotentHint).toBe(true)
     expect(t.annotations?.openWorldHint).toBe(true)

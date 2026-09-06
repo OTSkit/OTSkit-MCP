@@ -50,7 +50,15 @@ export function validateFilePath(
   }
   if (whitelist.length > 0) {
     const allowed = whitelist.some(dir => {
-      const root = resolve(dir)
+      // Canonicalize the whitelist root too. Otherwise a real path under a
+      // symlinked temp/root directory is incorrectly rejected, and the
+      // comparison is not consistently symlink-safe on both sides.
+      let root: string
+      try {
+        root = realpathSync(resolve(dir))
+      } catch {
+        return false
+      }
       return canonical === root || canonical.startsWith(root + sep)
     })
     if (!allowed) return { error: 'path_not_allowed', details: `${canonical} is outside allowed directories` }

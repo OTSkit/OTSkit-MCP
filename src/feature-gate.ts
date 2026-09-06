@@ -2,7 +2,8 @@ import type { Config } from './types.js'
 
 const STAMP_TOOLS = new Set([
   'create_timestamp', 'upgrade_timestamp', 'verify_timestamp',
-  'inspect_timestamp', 'list_pending', 'stamp_file', 'hash_file', 'watch',
+  'verify_external_proof', 'inspect_timestamp', 'list_pending', 'stamp_file',
+  'hash_file', 'watch',
 ])
 const PRESERVE_TOOLS = new Set(['stamp_file'])
 
