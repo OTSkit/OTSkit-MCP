@@ -1,3 +1,10 @@
+# [0.10.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.9.0...v0.10.0) (2026-09-13)
+
+
+### Features
+
+* require chain verification for timestamp confirmation ([aff5da0](https://github.com/OTSkit/OTSkit-MCP/commit/aff5da09cb9cba33c32b5123bec972a0f7b665ad))
+
 # [0.9.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.8.5...v0.9.0) (2026-09-06)
 
 
