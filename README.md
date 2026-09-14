@@ -18,6 +18,8 @@ OpenTimestamps MCP server - stamp, upgrade, and verify Bitcoin timestamps via AI
 
 Exposes a set of tools to any MCP-compatible agent so it can timestamp documents, monitor confirmation status, and verify proofs against the Bitcoin blockchain - all from a conversation.
 
+> This is an independent implementation of the OpenTimestamps protocol. It is not affiliated with, endorsed by, or maintained by the OpenTimestamps project.
+
 <a href="https://glama.ai/mcp/servers/@OTSkit/OTSkit-MCP">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/@OTSkit/OTSkit-MCP/badge" alt="OTSkit MCP server on Glama — security, license and quality rating plus download count" />
 </a>
