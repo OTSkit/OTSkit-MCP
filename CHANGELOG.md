@@ -1,3 +1,10 @@
+## [0.10.1](https://github.com/OTSkit/OTSkit-MCP/compare/v0.10.0...v0.10.1) (2026-10-14)
+
+
+### Bug Fixes
+
+* **deps:** patch the open security advisories ([#49](https://github.com/OTSkit/OTSkit-MCP/issues/49)) ([7d7a04d](https://github.com/OTSkit/OTSkit-MCP/commit/7d7a04d92faf6c4935b046779198b758b6b58330))
+
 # [0.10.0](https://github.com/OTSkit/OTSkit-MCP/compare/v0.9.0...v0.10.0) (2026-09-13)
 
 
