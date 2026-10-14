@@ -41,7 +41,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@modelcontextprotocol/sdk": "^1.32.1",
     "@otskit/client": "^0.7.2",
     "node-sqlite3-wasm": "0.8.59",
     "zod": "^4.6.5"
@@ -51,10 +51,10 @@
       "esbuild"
     ],
     "overrides": {
-      "hono": "4.12.34",
-      "undici@^6.0.0": "6.27.0",
-      "undici@^7.0.0": "7.29.0",
-      "postcss": "8.5.18"
+      "hono": "4.13.13",
+      "undici@^6.0.0": "6.29.0",
+      "undici@^7.0.0": "7.30.0",
+      "postcss": "8.5.30"
     }
   },
   "devDependencies": {
