@@ -43,7 +43,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.1",
     "@otskit/client": "^0.7.2",
-    "node-sqlite3-wasm": "0.8.59",
+    "node-sqlite3-wasm": "0.8.61",
     "zod": "^4.6.5"
   },
   "pnpm": {
